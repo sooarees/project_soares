@@ -2,13 +2,13 @@
      width="30%"
      style="padding: 10px">
 
-# << Título do projeto >>
+# << Royal Knight >>
 
-## << Descrição breve do domínio do problema >>
+## << Jogo de Plataforma 2D Focado em movimentação >>
 
 > Repositório destinado para o desenvolvimento do projeto final da discipliana PRG22107 - Programação orienta a objeto. 
 > 
-> Aluno: Nome do aluno  
+> Aluno: Roger Soares Stecker Maciel 
 > Professor: Hugo Marcondes
 
 <p align=center><strong>SUMÁRIO</strong></p>
