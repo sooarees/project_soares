@@ -58,7 +58,17 @@ Ao morrer, o jogador retorna ao início da fase e pode tentar novamente até com
 ### Representação visual
 
 <img src="img/CasosdeUso.png" 
-     width="50%" 
+     width="70%" 
+     style="padding: 10px">
+
+
+
+## Classes
+
+Primeira análise: 
+
+<img src="img/ClassAnalysis.png" 
+     width="70%" 
      style="padding: 10px">
 
 
