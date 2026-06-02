@@ -101,15 +101,8 @@ A classe **PlataformaMovel** é uma especialização de **Plataforma** que possu
 
 ### Obstaculo
 
-A classe **Obstaculo** representa elementos que oferecem risco ao jogador. Sua função principal é detectar colisões e aplicar seus efeitos quando o personagem entra em contato com eles.
+A classe **Obstaculo** representa elementos que oferecem risco ao jogador. Sua função principal é detectar colisões e eliminar o personagem quando entra em contato com eles.
 
-### Espinho
-
-A classe **Espinho** é um tipo de **Obstaculo** que elimina o jogador ao ser tocado. É utilizada para aumentar a dificuldade da fase e exigir precisão na movimentação.
-
-### Buraco
-
-A classe **Buraco** representa uma região perigosa da fase. Caso o jogador caia nela, a tentativa é encerrada e a fase é reiniciada.
 
 ### Meta
 
