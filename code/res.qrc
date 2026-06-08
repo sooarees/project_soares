@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/Sprites">
+        <file>Game Images/Royal/Knight/IDLE.png</file>
+        <file>Game Images/Royal/Knight/JUMP.png</file>
+        <file>Game Images/Royal/Knight/RUN.png</file>
+    </qresource>
+</RCC>
