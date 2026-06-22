@@ -41,7 +41,26 @@ Game::Game(QWidget *parent): QWidget(parent)
 
     setLayout(layout);
 
-    showMaximized();
+    view->setSceneRect(scene->sceneRect());
+
+    showFullScreen();
+    //showMaximized();
+
+    view->fitInView(
+        scene->sceneRect(),
+        Qt::KeepAspectRatio
+        );
+
+    // vidas
+    vidas = 5;
+
+    // hud
+    hud = new HUD(this);
+
+    hud->setGeometry(20,20,300,50);
+
+    hud->show();
+    hud->raise();
 
     // gameTimer
     gameTimer = new QTimer(this);
@@ -63,7 +82,11 @@ void Game::update()
 
         if(portal)
         {
-            carregarFase(portal->getDestino());
+            ganharVida();
+
+            faseAtual = portal->getDestino();
+
+            carregarFase(faseAtual);
             break;
         }
     }
@@ -71,7 +94,7 @@ void Game::update()
     // "buraco"
     if(knight->y() > 1100)
     {
-        carregarFase(faseAtual);
+        perderVida();
     }
 
 }
@@ -84,23 +107,12 @@ void Game::carregarFase(int fase)
     // DEBUG VISIUAL
     scene->addRect(
         scene->sceneRect(),
-        QPen(Qt::red, 4),
+        QPen(Qt::red, 2),
         QBrush(Qt::NoBrush)
         );
 
     switch(fase)
     {
-    /*case 1:
-        scene->addItem(new Plataforma(0,950,1920,130));
-        scene->addItem(new Plataforma(500,800,70,20));
-
-        scene->addItem(new Portal(1800,850,2));
-
-        knight->setPos(120,750);
-        scene->addItem(knight);
-
-        break;
-    */
     case 1:
     {
         // chão 1
@@ -163,5 +175,49 @@ void Game::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    if(view)
+    {
+        view->fitInView(
+            scene->sceneRect(),
+            Qt::KeepAspectRatio
+            );
+
+        view->centerOn(scene->sceneRect().center());
+    }
+
+    if(hud && view)
+    {
+        int margemX = (width() - view->viewport()->width()) / 2;
+        hud->move(margemX + 20,20);
+    }
+}
+
+void Game::perderVida()
+{
+    vidas--;
+
+    hud->setVidas(vidas);
+
+
+    if(vidas <= 0)
+    {
+        vidas = 5;
+        hud->setVidas(vidas);
+
+        carregarFase(1);
+    }
+    else
+    {
+        carregarFase(faseAtual);
+    }
+}
+
+void Game::ganharVida()
+{
+    if(vidas < 5)
+    {
+        vidas++;
+
+        hud->setVidas(vidas);
+    }
 }

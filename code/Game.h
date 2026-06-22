@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "plataforma.h"
 #include "portal.h"
+#include "hud.h"
 
 class Game : public QWidget
 {
@@ -22,12 +23,19 @@ private slots:
 
 private:
     QGraphicsScene *scene;
-    QGraphicsView *view;
+    QGraphicsView *view = nullptr;;
     Player *knight;
     QTimer *gameTimer;
 
+    // fase
     int faseAtual;
     void carregarFase(int fase);
+
+    // vidas
+    void perderVida();
+    void ganharVida();
+    HUD *hud = nullptr;;
+    int vidas;
 protected:
     void resizeEvent(QResizeEvent *event) override;
 };
