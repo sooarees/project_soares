@@ -27,6 +27,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         plataforma.h plataforma.cpp
         res.qrc
         portal.h portal.cpp
+        menu.h menu.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET royal APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

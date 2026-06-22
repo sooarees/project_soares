@@ -282,13 +282,13 @@ void Player::updateMovement()
             veloY = 0;
         }
 
-        // fundo
-        if(y() + rect().height() > limites.bottom())
+        // caiu fora da fase
+        if(y() > limites.bottom())
         {
-            setY(limites.bottom() - rect().height());
             veloY = 0;
-            onGround = true;
+            onGround = false;
         }
+
     }
 
     // Animacoes

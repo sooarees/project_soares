@@ -1,7 +1,8 @@
 #include "Game.h"
+#include <QVBoxLayout>
 #include <QBrush>
 
-Game::Game()
+Game::Game(QWidget *parent): QWidget(parent)
 {
     // Cena
     scene = new QGraphicsScene();
@@ -21,20 +22,26 @@ Game::Game()
     carregarFase(faseAtual);
 
     // View
-    view = new QGraphicsView();
+    view = new QGraphicsView(this);
     view->setScene(scene);
 
-    //view->showMaximized();
-
-    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
-    //view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    //view->showFullScreen(); //pra jogar melhor pra testar n
-    view->showMaximized();
+    // ocupa todo espaço disponível
+    view->setSizePolicy(
+        QSizePolicy::Expanding,
+        QSizePolicy::Expanding
+        );
 
-    //view->resize(1920,1080);
-    view->show();
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0,0,0,0);
+    layout->addWidget(view);
+
+    setLayout(layout);
+
+    showMaximized();
 
     // gameTimer
     gameTimer = new QTimer(this);
@@ -42,10 +49,6 @@ Game::Game()
     connect(gameTimer, &QTimer::timeout, this, &Game::update);
 
     gameTimer->start(16); // 16ms aproximadamente 60fps, 60fps = 1000ms/16ms
-
-    Portal *portal = new Portal(1800, 850,2);
-    scene->addItem(portal);
-    //scene->addItem(new Portal(300, 400, 5));
 }
 
 void Game::update()
@@ -65,6 +68,12 @@ void Game::update()
         }
     }
 
+    // "buraco"
+    if(knight->y() > 1100)
+    {
+        carregarFase(faseAtual);
+    }
+
 }
 
 void Game::carregarFase(int fase)
@@ -75,7 +84,7 @@ void Game::carregarFase(int fase)
     // DEBUG VISIUAL
     scene->addRect(
         scene->sceneRect(),
-        QPen(Qt::red, 10),
+        QPen(Qt::red, 4),
         QBrush(Qt::NoBrush)
         );
 
@@ -94,8 +103,11 @@ void Game::carregarFase(int fase)
     */
     case 1:
     {
-        // chão
-        scene->addItem(new Plataforma(0,950,1920,130));
+        // chão 1
+        scene->addItem(new Plataforma(0,950,500,130));
+
+        // chão 2
+        scene->addItem(new Plataforma(700,950,1220,130));
 
 
         // plataforma inicial
@@ -145,4 +157,11 @@ void Game::carregarFase(int fase)
     }
 
     knight->setFocus();
+}
+
+void Game::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
 }
