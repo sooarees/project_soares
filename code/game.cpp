@@ -20,29 +20,6 @@ Game::Game()
     faseAtual = 1;
     carregarFase(faseAtual);
 
-    /* plataformas
-    Plataforma *ground = new Plataforma(0,950,1920,180);
-    scene->addItem(ground);
-
-    Plataforma *plat5 = new Plataforma(850,800,70,20);
-    scene->addItem(plat5);
-
-    Plataforma *plat1 = new Plataforma(500,800,70,20);
-    scene->addItem(plat1);
-
-    Plataforma *plat2 = new Plataforma(800,340,150,20);
-    scene->addItem(plat2);
-
-    Plataforma *plat3 = new Plataforma(1200,200,200,20);
-    scene->addItem(plat3);
-
-    Plataforma *plat4 = new Plataforma(650,750,59,200);
-    scene->addItem(plat4);
-
-
-
-*/
-
     // View
     view = new QGraphicsView();
     view->setScene(scene);
@@ -95,9 +72,16 @@ void Game::carregarFase(int fase)
     scene->removeItem(knight);
     scene->clear();
 
+    // DEBUG VISIUAL
+    scene->addRect(
+        scene->sceneRect(),
+        QPen(Qt::red, 10),
+        QBrush(Qt::NoBrush)
+        );
+
     switch(fase)
     {
-    case 1:
+    /*case 1:
         scene->addItem(new Plataforma(0,950,1920,130));
         scene->addItem(new Plataforma(500,800,70,20));
 
@@ -107,7 +91,46 @@ void Game::carregarFase(int fase)
         scene->addItem(knight);
 
         break;
+    */
+    case 1:
+    {
+        // chão
+        scene->addItem(new Plataforma(0,950,1920,130));
 
+
+        // plataforma inicial
+        scene->addItem(new Plataforma(250,850,150,20));
+
+        // subida
+        scene->addItem(new Plataforma(500,750,120,20));
+        scene->addItem(new Plataforma(700,650,120,20));
+
+        // salto maior
+        scene->addItem(new Plataforma(950,550,150,20));
+
+        // descida
+        scene->addItem(new Plataforma(1200,700,150,20));
+        scene->addItem(new Plataforma(1450,600,120,20));
+
+
+        // obstáculo vertical
+        scene->addItem(new Plataforma(900,750,60,200));
+
+
+        // trecho final
+        scene->addItem(new Plataforma(1600,500,200,20));
+
+
+        // portal final
+        scene->addItem(new Portal(1800,850,2));
+
+
+        // spawn
+        knight->setPos(120,750);
+        scene->addItem(knight);
+
+        break;
+    }
 
     case 2:
         scene->addItem(new Plataforma(0,950,1920,130));
