@@ -261,6 +261,35 @@ void Player::updateMovement()
         }
     }
 
+    // Sair da cena
+    if(scene())
+    {
+        QRectF limites = scene()->sceneRect();
+
+        // esquerda
+        if(x() < limites.left())
+            setX(limites.left());
+
+        // direita
+        if(x() + rect().width() > limites.right())
+            setX(limites.right() - rect().width());
+
+        // topo
+        if(y() < limites.top())
+        {
+            setY(limites.top());
+            veloY = 0;
+        }
+
+        // fundo
+        if(y() + rect().height() > limites.bottom())
+        {
+            setY(limites.bottom() - rect().height());
+            veloY = 0;
+            onGround = true;
+        }
+    }
+
     // Animacoes
     State nextState;
 

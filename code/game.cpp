@@ -39,6 +39,10 @@ Game::Game()
     // View
     view = new QGraphicsView();
     view->setScene(scene);
+
+    //view->showMaximized();
+
+    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
     //view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
