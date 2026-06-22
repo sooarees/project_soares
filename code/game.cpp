@@ -8,7 +8,19 @@ Game::Game()
     scene->setBackgroundBrush(Qt::white);
     scene->setSceneRect(0,0,1920,1080);
 
-    // plataformas
+    // Jogador
+    knight = new Player(120,750);
+
+    knight->setFlag(QGraphicsItem::ItemIsFocusable);
+    knight->setFocus();
+
+    scene->addItem(knight);
+
+    // Fase
+    faseAtual = 1;
+    carregarFase(faseAtual);
+
+    /* plataformas
     Plataforma *ground = new Plataforma(0,950,1920,180);
     scene->addItem(ground);
 
@@ -28,13 +40,8 @@ Game::Game()
     scene->addItem(plat4);
 
 
-    // Jogador
-    knight = new Player(120,750);
 
-    knight->setFlag(QGraphicsItem::ItemIsFocusable);
-    knight->setFocus();
-
-    scene->addItem(knight);
+*/
 
     // View
     view = new QGraphicsView();
@@ -58,10 +65,61 @@ Game::Game()
     connect(gameTimer, &QTimer::timeout, this, &Game::update);
 
     gameTimer->start(16); // 16ms aproximadamente 60fps, 60fps = 1000ms/16ms
+
+    Portal *portal = new Portal(1800, 850,2);
+    scene->addItem(portal);
+    //scene->addItem(new Portal(300, 400, 5));
 }
 
 void Game::update()
 {
-    // player center
+    // movement
     knight->updateMovement();
+
+    // portal
+    for(QGraphicsItem *item : knight->collidingItems())
+    {
+        Portal *portal = dynamic_cast<Portal*>(item);
+
+        if(portal)
+        {
+            carregarFase(portal->getDestino());
+            break;
+        }
+    }
+
+}
+
+void Game::carregarFase(int fase)
+{
+    scene->removeItem(knight);
+    scene->clear();
+
+    switch(fase)
+    {
+    case 1:
+        scene->addItem(new Plataforma(0,950,1920,130));
+        scene->addItem(new Plataforma(500,800,70,20));
+
+        scene->addItem(new Portal(1800,850,2));
+
+        knight->setPos(120,750);
+        scene->addItem(knight);
+
+        break;
+
+
+    case 2:
+        scene->addItem(new Plataforma(0,950,1920,130));
+        scene->addItem(new Plataforma(800,700,200,20));
+
+        scene->addItem(new Portal(1800,850,3));
+
+        knight->setPos(100,750);
+        scene->addItem(knight);
+
+        break;
+    }
+
+    knight->setFocus();
 }

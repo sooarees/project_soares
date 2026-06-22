@@ -7,6 +7,7 @@
 
 #include "Player.h"
 #include "plataforma.h"
+#include "portal.h"
 
 class Game : public QObject
 {
@@ -23,6 +24,10 @@ private:
     QGraphicsView *view;
     Player *knight;
     QTimer *gameTimer;
+
+    int faseAtual;
+
+    void carregarFase(int fase);
 };
 
 #endif // GAME_H

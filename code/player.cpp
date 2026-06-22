@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "elementofase.h"
 #include "plataforma.h"
+#include "portal.h"
 #include <QKeyEvent>
 #include <QGraphicsScene>
 #include <QPainter>
@@ -313,4 +314,5 @@ void Player::updateMovement()
     if (nextState != currentState) {
         setAnimation(nextState);
     }
+
 }
