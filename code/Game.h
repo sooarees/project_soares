@@ -10,6 +10,8 @@
 #include "plataforma.h"
 #include "portal.h"
 #include "hud.h"
+#include "armadilha.h"
+#include "espinho.h"
 
 class Game : public QWidget
 {

@@ -75,9 +75,10 @@ void Game::update()
     // movement
     knight->updateMovement();
 
-    // portal
     for(QGraphicsItem *item : knight->collidingItems())
     {
+
+        // portal
         Portal *portal = dynamic_cast<Portal*>(item);
 
         if(portal)
@@ -87,6 +88,14 @@ void Game::update()
             faseAtual = portal->getDestino();
 
             carregarFase(faseAtual);
+            break;
+        }
+        // armadilha
+        Armadilha *armadilha = dynamic_cast<Armadilha*>(item);
+
+        if(armadilha)
+        {
+            perderVida();
             break;
         }
     }
@@ -138,7 +147,7 @@ void Game::carregarFase(int fase)
 
 
         // obstáculo vertical
-        scene->addItem(new Plataforma(900,750,60,200));
+        //scene->addItem(new Plataforma(900,750,60,200));
 
 
         // trecho final
@@ -148,6 +157,9 @@ void Game::carregarFase(int fase)
         // portal final
         scene->addItem(new Portal(1800,850,2));
 
+
+        // espinho
+        scene->addItem(new Espinho(900,910));
 
         // spawn
         knight->setPos(120,750);
