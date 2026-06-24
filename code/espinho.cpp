@@ -4,7 +4,7 @@
 Espinho::Espinho(qreal x, qreal y)
     : Armadilha(x,y,60,40)
 {
-    sprite.load(":/Sprites/Game Images/Royal/Espinho/espinho.png");
+    sprite.load(":/Sprites/Game Images/Royal/Armadilhas/espinho.png");
 }
 
 void Espinho::paint(

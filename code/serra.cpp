@@ -1,9 +1,11 @@
 #include "serra.h"
+#include <QDateTime>
 #include <QPainter>
 
 Serra::Serra(qreal x, qreal y)
     : Armadilha(x,y,50,50)
 {
+    sprite.load(":/Sprites/Game Images/Royal/Armadilhas/serra.png");
 }
 
 void Serra::paint(
@@ -14,11 +16,14 @@ void Serra::paint(
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-    painter->setBrush(Qt::gray);
-    painter->setPen(QPen(Qt::darkGray, 3));
-    painter->drawEllipse(QRectF(0,0,50,50));
+    const int frameWidth = 32;
+    const int frameHeight = 32;
+    const int totalFrames = 8;
+    const int frame = (QDateTime::currentMSecsSinceEpoch() / 50) % totalFrames;
 
-    painter->setBrush(Qt::lightGray);
-    painter->setPen(Qt::NoPen);
-    painter->drawEllipse(QRectF(18,18,14,14));
+    painter->drawPixmap(
+        QRectF(0,0,50,50),
+        sprite,
+        QRectF(frame * frameWidth,0,frameWidth,frameHeight)
+        );
 }
