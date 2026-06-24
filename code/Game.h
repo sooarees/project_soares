@@ -12,6 +12,7 @@
 #include "hud.h"
 #include "armadilha.h"
 #include "espinho.h"
+#include "serra.h"
 
 class Game : public QWidget
 {

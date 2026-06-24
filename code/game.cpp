@@ -161,6 +161,9 @@ void Game::carregarFase(int fase)
         // espinho
         scene->addItem(new Espinho(900,910));
 
+        // serra
+        scene->addItem(new Serra(1100,900));
+
         // spawn
         knight->setPos(120,750);
         scene->addItem(knight);
