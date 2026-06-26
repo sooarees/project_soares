@@ -24,7 +24,7 @@ Game::Game(QWidget *parent): QWidget(parent)
     scene = new QGraphicsScene();
     scene->setSceneRect(0,0,1920,1080);
 
-    QPixmap background(":/Sprites/Game Images/Royal/Castle/background_2.png");
+    QPixmap background(":/Sprites/Game Images/Royal/Castle/background.png");
     scene->setBackgroundBrush(QBrush(background)); // repete a imagem para preencher a cena
 
     // Jogador

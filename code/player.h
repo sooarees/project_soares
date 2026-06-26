@@ -4,6 +4,7 @@
 #include <QGraphicsRectItem>
 #include <QObject>
 #include <QKeyEvent>
+#include <QPainterPath>
 #include <QTimer>
 #include "elementofase.h"
 
@@ -21,6 +22,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF boundingRect() const override;
+    QPainterPath shape() const override;
 
 private slots:
     void advanceAnimation();
@@ -59,6 +61,7 @@ private:
 
     // trocar de sprite
     void setAnimation (State newState);
+    QRectF hitbox() const;
 
     // guardar direcao do knight
     bool facingRight;

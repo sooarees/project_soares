@@ -5,8 +5,9 @@
 #include <QKeyEvent>
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QPainterPath>
 
-Player::Player(qreal x, qreal y): ElementoFase(x,y,51,99)
+Player::Player(qreal x, qreal y): ElementoFase(x,y,51,96)
 {
     // iniciando movimentacoes
     leftPressed = false;
@@ -123,6 +124,7 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     painter->drawPixmap(QRectF(offsetX, offsetY, visualWidth, visualHeight), currentSheet, sourceRect);
 
     painter->restore();
+
 }
 
 // corrige os "fantasmas" das animacoes
@@ -135,6 +137,19 @@ QRectF Player::boundingRect() const
     qreal offsetY = rect().height() - visualHeight;
 
     return QRectF(offsetX, offsetY, visualWidth, visualHeight);
+}
+
+QPainterPath Player::shape() const
+{
+    QPainterPath path;
+    path.addRect(hitbox());
+    return path;
+}
+
+QRectF Player::hitbox() const
+{
+    // desce o topo da hitbox em 2px, mantendo a parte de baixo no mesmo lugar
+    return QRectF(rect().x(), rect().y() + 5, rect().width(), rect().height() - 5);
 }
 
 // movimentacao
@@ -198,8 +213,8 @@ void Player::updateMovement()
     }
 
     // salva bordas antes de mover em X
-    qreal prevRight = x() + rect().width();
-    qreal prevLeft  = x();
+    qreal prevRight = x() + hitbox().right();
+    qreal prevLeft  = x() + hitbox().left();
 
     setX(x() + veloX);
 
@@ -213,10 +228,10 @@ void Player::updateMovement()
 
         // player vindo da esquerda, empurra pra fora a esquerda
         if(prevRight <= platLeft && veloX >0)
-            setX(platLeft - rect().width());
+            setX(platLeft - hitbox().right());
         // player vindo da direita, empurra pra fora a direita
         else if(prevLeft >= platRight && veloX < 0)
-            setX(platRight);
+            setX(platRight - hitbox().left());
     }
 
     // vertical
@@ -229,8 +244,8 @@ void Player::updateMovement()
     veloY += gravity;
 
     // salva bordas antes de mover em Y
-    qreal prevBottom = y() + rect().height();
-    qreal prevTop    = y();
+    qreal prevBottom = y() + hitbox().bottom();
+    qreal prevTop    = y() + hitbox().top();
 
     setY(y() + veloY);
 
@@ -248,14 +263,14 @@ void Player::updateMovement()
         // player estava acima, pousa no topo
         if(prevBottom <= platTop && veloY > 0)
         {
-            setY(platTop - rect().height());
+            setY(platTop - hitbox().bottom());
             veloY = 0;
             onGround = true;
         }
         // Player estava abaixo, bate no teto
         else if(prevTop >= platBottom && veloY < 0)
         {
-            setY(platBottom);
+            setY(platBottom - hitbox().top());
             veloY = 0;
             onGround = false;
         }
@@ -267,17 +282,17 @@ void Player::updateMovement()
         QRectF limites = scene()->sceneRect();
 
         // esquerda
-        if(x() < limites.left())
-            setX(limites.left());
+        if(x() + hitbox().left() < limites.left())
+            setX(limites.left() - hitbox().left());
 
         // direita
-        if(x() + rect().width() > limites.right())
-            setX(limites.right() - rect().width());
+        if(x() + hitbox().right() > limites.right())
+            setX(limites.right() - hitbox().right());
 
         // topo
-        if(y() < limites.top())
+        if(y() + hitbox().top() < limites.top())
         {
-            setY(limites.top());
+            setY(limites.top() - hitbox().top());
             veloY = 0;
         }
 

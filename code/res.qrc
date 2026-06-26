@@ -15,6 +15,15 @@
         <file>Game Images/Royal/Castle/plat_esq.png</file>
         <file>Game Images/Royal/Castle/plat_mid.png</file>
         <file>Game Images/Royal/Castle/plat_up.png</file>
+        <file>Game Images/Royal/Menu/botao/Button_01_disabled.png</file>
+        <file>Game Images/Royal/Menu/botao/Button_01_hovered.png</file>
+        <file>Game Images/Royal/Menu/botao/Button_01_normal.png</file>
+        <file>Game Images/Royal/Menu/botao/Button_01_pressed.png</file>
+        <file>Game Images/Royal/Menu/botao/Button_02_hovered.png</file>
+        <file>Game Images/Royal/Menu/botao/Button_02_pressed.png</file>
+        <file>Game Images/Royal/Menu/botao/Button_2_normal.png</file>
+        <file>Game Images/Royal/Menu/botao/Exit_Icon.png</file>
+        <file>Game Images/Royal/Menu/botao/Play_Icon.png</file>
     </qresource>
     <qresource prefix="/Fases">
         <file>fases.json</file>
