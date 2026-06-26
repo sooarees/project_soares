@@ -41,8 +41,8 @@ void HUD::paintEvent(QPaintEvent *event)
         return;
     }
 
-    const int tamanhoVida = 32;
-    const int espaco = 8;
+    const int tamanhoVida = 28;
+    const int espaco = 6;
     const int larguraTotalVidas = vidas * tamanhoVida + (vidas - 1) * espaco;
     const int inicioX = (width() - larguraTotalVidas) / 2;
     const int y = (height() - tamanhoVida) / 2;

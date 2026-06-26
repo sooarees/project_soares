@@ -30,6 +30,7 @@
             "portais": [
                 { "x": 1800, "y": 850, "destino": 3 }
             ],
+            "princesa": { "x": 1600, "y": 740 },
             "armadilhas": []
         },
         "3": {

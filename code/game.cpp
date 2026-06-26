@@ -1,12 +1,19 @@
 #include "Game.h"
 #include <QBrush>
 #include <QFile>
+#include <QFontDatabase>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QLabel>
+#include <QPainter>
+#include <QPaintEvent>
 #include <QPen>
 #include <QPixmap>
+#include <QPushButton>
+#include <QMessageBox>
+#include <QStringList>
 #include <QVBoxLayout>
 
 namespace // funcao valor so existe nesse arquivo
@@ -16,6 +23,32 @@ qreal valor(const QJsonObject &objeto, const QString &chave, qreal padrao = 0)
 {
     return objeto.value(chave).toDouble(padrao); // devolve o valor da chave e transforma em double
 }
+
+class CronometroLabel : public QLabel
+{
+public:
+    explicit CronometroLabel(QWidget *parent = nullptr)
+        : QLabel(parent)
+    {
+        setAttribute(Qt::WA_TranslucentBackground);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        Q_UNUSED(event);
+
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+
+        QPixmap background(":/Sprites/Game Images/Royal/Hud/background.png");
+        painter.drawPixmap(rect(), background, background.rect());
+
+        painter.setPen(QColor("#ffd75a"));
+        painter.setFont(font());
+        painter.drawText(rect(), alignment(), text());
+    }
+};
 }
 
 Game::Game(QWidget *parent): QWidget(parent)
@@ -75,10 +108,62 @@ Game::Game(QWidget *parent): QWidget(parent)
     // hud
     hud = new HUD(this);
 
-    hud->setGeometry(20,20,300,72);
+    hud->setGeometry(20,20,220,60);
 
     hud->show();
     hud->raise();
+
+    // botao temporario para fechar o jogo
+    botaoFechar = new QPushButton("X", this);
+    botaoFechar->setFixedSize(28,28);
+    botaoFechar->setFocusPolicy(Qt::NoFocus);
+    botaoFechar->setStyleSheet(
+        "QPushButton {"
+        "background-color: rgba(20, 20, 20, 180);"
+        "border: 2px solid white;"
+        "color: white;"
+        "font-weight: bold;"
+        "}"
+        "QPushButton:hover {"
+        "background-color: rgba(180, 40, 40, 220);"
+        "}"
+        );
+    botaoFechar->move((width() - botaoFechar->width()) / 2,20);
+    botaoFechar->show();
+    botaoFechar->raise();
+
+    connect(botaoFechar, &QPushButton::clicked, this, &Game::close);
+
+    // cronometro
+    labelCronometro = new CronometroLabel(this);
+    labelCronometro->setFixedSize(220,60);
+    labelCronometro->setAlignment(Qt::AlignCenter);
+
+    int idFonteCronometro = QFontDatabase::addApplicationFont(":/Sprites/Game Images/Royal/Menu/GravityBold8.ttf");
+    QString familiaCronometro = "Georgia";
+
+    if(idFonteCronometro != -1)
+    {
+        QStringList familias = QFontDatabase::applicationFontFamilies(idFonteCronometro);
+
+        if(!familias.isEmpty())
+            familiaCronometro = familias.first();
+    }
+
+    QFont fonteCronometro(familiaCronometro);
+    fonteCronometro.setPointSize(16);
+    fonteCronometro.setBold(true);
+    labelCronometro->setFont(fonteCronometro);
+
+    labelCronometro->move(width() - labelCronometro->width() - 20,20);
+    labelCronometro->show();
+    labelCronometro->raise();
+
+    cronometro.start();
+    cronometroTimer = new QTimer(this);
+    connect(cronometroTimer, &QTimer::timeout, this, &Game::atualizarCronometro);
+    cronometroTimer->start(30);
+    atualizarCronometro();
 
     // gameTimer
     gameTimer = new QTimer(this);
@@ -105,6 +190,15 @@ void Game::update()
             faseAtual = portal->getDestino();
 
             carregarFase(faseAtual);
+            break;
+        }
+
+        // princesa
+        Princesa *princesa = dynamic_cast<Princesa*>(item);
+
+        if(princesa)
+        {
+            ganharJogo();
             break;
         }
 
@@ -190,6 +284,15 @@ void Game::carregarFase(int fase)
             scene->addItem(new Serra(valor(armadilha, "x"), valor(armadilha, "y")));
     }
 
+    QJsonObject princesa = dadosFase.value("princesa").toObject();
+    if(!princesa.isEmpty())
+    {
+        scene->addItem(new Princesa(
+            valor(princesa, "x"),
+            valor(princesa, "y")
+            ));
+    }
+
     // le o spawn e converte em objeto
     QJsonObject spawn = dadosFase.value("spawn").toObject();
     knight->setPos(valor(spawn, "x", 120), valor(spawn, "y", 750));
@@ -215,6 +318,19 @@ void Game::resizeEvent(QResizeEvent *event)
     {
         int margemX = (width() - view->viewport()->width()) / 2;
         hud->move(margemX + 20,20);
+
+    }
+
+    if(labelCronometro)
+    {
+        labelCronometro->move(width() - labelCronometro->width() - 20,20);
+        labelCronometro->raise();
+    }
+
+    if(botaoFechar)
+    {
+        botaoFechar->move((width() - botaoFechar->width()) / 2,20);
+        botaoFechar->raise();
     }
 }
 
@@ -245,4 +361,46 @@ void Game::ganharVida()
 
         hud->setVidas(vidas);
     }
+}
+
+void Game::ganharJogo()
+{
+    gameTimer->stop();
+    if(cronometroTimer)
+        cronometroTimer->stop();
+
+    knight->clearFocus();
+    knight->setFlag(QGraphicsItem::ItemIsFocusable, false);
+
+    QString tempoFinal = formatarTempo(cronometro.elapsed());
+    if(labelCronometro)
+        labelCronometro->setText(tempoFinal);
+
+    QMessageBox::information(
+        this,
+        "Royal Knight",
+        QString("Voce resgatou a princesa!\nTempo: ") + tempoFinal
+        );
+
+    close();
+}
+
+void Game::atualizarCronometro()
+{
+    if(!labelCronometro)
+        return;
+
+    labelCronometro->setText(formatarTempo(cronometro.elapsed()));
+}
+
+QString Game::formatarTempo(qint64 milissegundos) const
+{
+    qint64 minutos = milissegundos / 60000;
+    qint64 segundos = (milissegundos % 60000) / 1000;
+    qint64 milesimos = milissegundos % 1000;
+
+    return QString("%1:%2:%3")
+        .arg(minutos, 2, 10, QChar('0'))
+        .arg(segundos, 2, 10, QChar('0'))
+        .arg(milesimos, 3, 10, QChar('0'));
 }
