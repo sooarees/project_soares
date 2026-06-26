@@ -6,7 +6,7 @@
 #include <QGraphicsView>
 #include <QTimer>
 
-#include "Player.h"
+#include "player.h"
 #include "plataforma.h"
 #include "portal.h"
 #include "hud.h"

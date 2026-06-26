@@ -1,7 +1,7 @@
 #ifndef PLATAFORMA_H
 #define PLATAFORMA_H
 
-#include "ElementoFase.h"
+#include "elementofase.h"
 
 class Plataforma : public ElementoFase
 {

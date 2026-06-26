@@ -1,4 +1,4 @@
-#include "Menu.h"
+#include "menu.h"
 #include "Game.h"
 
 #include <QPushButton>

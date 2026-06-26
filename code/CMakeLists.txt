@@ -14,7 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        Game.cpp
+        game.cpp
         Game.h
 )
 
@@ -22,7 +22,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(royal
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        Player.h Player.cpp
+        player.h player.cpp
         elementofase.h elementofase.cpp
         plataforma.h plataforma.cpp
         res.qrc

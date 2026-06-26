@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "player.h"
 #include "elementofase.h"
 #include "plataforma.h"
 #include "portal.h"
