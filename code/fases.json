@@ -1,0 +1,53 @@
+{
+    "fases": {
+        "1": {
+            "spawn": { "x": 120, "y": 750 },
+            "plataformas": [
+                { "x": 0, "y": 950, "width": 500, "height": 130 },
+                { "x": 700, "y": 950, "width": 1220, "height": 130 },
+                { "x": 250, "y": 850, "width": 150, "height": 20 },
+                { "x": 500, "y": 750, "width": 120, "height": 20 },
+                { "x": 700, "y": 650, "width": 120, "height": 20 },
+                { "x": 950, "y": 550, "width": 150, "height": 20 },
+                { "x": 1200, "y": 700, "width": 150, "height": 20 },
+                { "x": 1450, "y": 600, "width": 120, "height": 20 },
+                { "x": 1600, "y": 500, "width": 200, "height": 20 }
+            ],
+            "portais": [
+                { "x": 1800, "y": 850, "destino": 2 }
+            ],
+            "armadilhas": [
+                { "tipo": "espinho", "x": 900, "y": 910 },
+                { "tipo": "serra", "x": 1100, "y": 900 }
+            ]
+        },
+        "2": {
+            "spawn": { "x": 100, "y": 750 },
+            "plataformas": [
+                { "x": 0, "y": 950, "width": 1920, "height": 130 },
+                { "x": 800, "y": 700, "width": 200, "height": 20 }
+            ],
+            "portais": [
+                { "x": 1800, "y": 850, "destino": 3 }
+            ],
+            "armadilhas": []
+        },
+        "3": {
+            "spawn": { "x": 100, "y": 750 },
+            "plataformas": [
+                { "x": 0, "y": 950, "width": 500, "height": 130 },
+                { "x": 650, "y": 850, "width": 180, "height": 20 },
+                { "x": 980, "y": 720, "width": 180, "height": 20 },
+                { "x": 1320, "y": 600, "width": 180, "height": 20 },
+                { "x": 1650, "y": 950, "width": 270, "height": 130 }
+            ],
+            "portais": [
+                { "x": 1800, "y": 850, "destino": 1 }
+            ],
+            "armadilhas": [
+                { "tipo": "espinho", "x": 720, "y": 810 },
+                { "tipo": "serra", "x": 1120, "y": 670 }
+            ]
+        }
+    }
+}

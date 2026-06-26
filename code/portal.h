@@ -3,6 +3,11 @@
 #define PORTAL_H
 
 #include "elementofase.h"
+#include <QPixmap>
+
+class QPainter;
+class QStyleOptionGraphicsItem;
+class QWidget;
 
 class Portal : public ElementoFase
 {
@@ -11,8 +16,16 @@ public:
 
     int getDestino() const;
 
+protected:
+    void paint(
+        QPainter *painter,
+        const QStyleOptionGraphicsItem *option,
+        QWidget *widget
+        ) override;
+
 private:
     int faseDestino;
+    QPixmap sprite;
 };
 
 #endif

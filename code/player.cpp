@@ -5,7 +5,6 @@
 #include <QKeyEvent>
 #include <QGraphicsScene>
 #include <QPainter>
-//#include <utility>
 
 Player::Player(qreal x, qreal y): ElementoFase(x,y,51,99)
 {

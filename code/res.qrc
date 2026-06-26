@@ -5,5 +5,9 @@
         <file>Game Images/Royal/Knight/RUN.png</file>
         <file>Game Images/Royal/Armadilhas/espinho.png</file>
         <file>Game Images/Royal/Armadilhas/serra.png</file>
+        <file>Game Images/Royal/Portal/Dimensional_Portal.png</file>
+    </qresource>
+    <qresource prefix="/Fases">
+        <file>fases.json</file>
     </qresource>
 </RCC>
