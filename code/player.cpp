@@ -7,6 +7,11 @@
 #include <QPainter>
 #include <QPainterPath>
 
+namespace
+{
+const int coyoteFramesMax = 8;
+}
+
 Player::Player(qreal x, qreal y): ElementoFase(x,y,51,96)
 {
     // iniciando movimentacoes
@@ -18,6 +23,7 @@ Player::Player(qreal x, qreal y): ElementoFase(x,y,51,96)
     veloY = 0;
 
     onGround = false;
+    coyoteFrames = 0;
     facingRight = true; // comeca olhando pra direita
 
     // carrega as spritesheets
@@ -148,7 +154,7 @@ QPainterPath Player::shape() const
 
 QRectF Player::hitbox() const
 {
-    // desce o topo da hitbox em 2px, mantendo a parte de baixo no mesmo lugar
+    // desce o topo da hitbox em 5px, mantendo a parte de baixo no mesmo lugar
     return QRectF(rect().x(), rect().y() + 5, rect().width(), rect().height() - 5);
 }
 
@@ -164,10 +170,11 @@ void Player::keyPressEvent(QKeyEvent *event)
         rightPressed = true;
     }
     // jump
-    if(event->key() == Qt::Key_Space && onGround)
+    if(event->key() == Qt::Key_Space && coyoteFrames > 0)
     {
         veloY = -15;
         onGround = false;
+        coyoteFrames = 0;
     }
     // fast Fall
     if(event->key() == Qt::Key_S && !onGround)
@@ -249,6 +256,7 @@ void Player::updateMovement()
 
     setY(y() + veloY);
 
+    bool estavaNoChao = onGround;
     onGround = false;
 
     for(QGraphicsItem *item : collidingItems())
@@ -266,6 +274,7 @@ void Player::updateMovement()
             setY(platTop - hitbox().bottom());
             veloY = 0;
             onGround = true;
+            coyoteFrames = coyoteFramesMax;
         }
         // Player estava abaixo, bate no teto
         else if(prevTop >= platBottom && veloY < 0)
@@ -273,7 +282,18 @@ void Player::updateMovement()
             setY(platBottom - hitbox().top());
             veloY = 0;
             onGround = false;
+            coyoteFrames = 0;
         }
+    }
+
+    if(!onGround && estavaNoChao && coyoteFrames <= 0)
+    {
+        coyoteFrames = coyoteFramesMax;
+    }
+
+    if(!onGround && coyoteFrames > 0)
+    {
+        coyoteFrames--;
     }
 
     // Sair da cena

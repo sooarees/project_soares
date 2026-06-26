@@ -75,7 +75,7 @@ Game::Game(QWidget *parent): QWidget(parent)
     // hud
     hud = new HUD(this);
 
-    hud->setGeometry(20,20,300,50);
+    hud->setGeometry(20,20,300,72);
 
     hud->show();
     hud->raise();
@@ -119,7 +119,7 @@ void Game::update()
     }
 
     // "buraco"
-    if(knight->y() > 1100)
+    if(knight->y() > 1030)
     {
         perderVida();
     }
@@ -129,13 +129,6 @@ void Game::carregarFase(int fase)
 {
     scene->removeItem(knight);
     scene->clear();
-
-    // DEBUG VISUAL
-    scene->addRect(
-        scene->sceneRect(),
-        QPen(Qt::red, 2),
-        QBrush(Qt::NoBrush)
-        );
 
     QFile arquivo(":/Fases/fases.json");
     if(!arquivo.open(QIODevice::ReadOnly)) // se nao abrir, bota ele em uma posicao padrao

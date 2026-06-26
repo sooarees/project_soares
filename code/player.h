@@ -38,6 +38,7 @@ private:
     qreal veloY;
 
     bool onGround;
+    int coyoteFrames;
 
     // timers
     QTimer *timer;
