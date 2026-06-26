@@ -6,6 +6,15 @@
         <file>Game Images/Royal/Armadilhas/espinho.png</file>
         <file>Game Images/Royal/Armadilhas/serra.png</file>
         <file>Game Images/Royal/Portal/Dimensional_Portal.png</file>
+        <file>Game Images/Royal/Castle/background.png</file>
+        <file>Game Images/Royal/Castle/background_2.png</file>
+        <file>Game Images/Royal/Castle/escada.dir.png</file>
+        <file>Game Images/Royal/Castle/escada.esq.png</file>
+        <file>Game Images/Royal/Castle/plat.dir.png</file>
+        <file>Game Images/Royal/Castle/plat_down.png</file>
+        <file>Game Images/Royal/Castle/plat_esq.png</file>
+        <file>Game Images/Royal/Castle/plat_mid.png</file>
+        <file>Game Images/Royal/Castle/plat_up.png</file>
     </qresource>
     <qresource prefix="/Fases">
         <file>fases.json</file>

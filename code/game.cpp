@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QPen>
+#include <QPixmap>
 #include <QVBoxLayout>
 
 namespace // funcao valor so existe nesse arquivo
@@ -21,8 +22,10 @@ Game::Game(QWidget *parent): QWidget(parent)
 {
     // Cena
     scene = new QGraphicsScene();
-    scene->setBackgroundBrush(Qt::white);
     scene->setSceneRect(0,0,1920,1080);
+
+    QPixmap background(":/Sprites/Game Images/Royal/Castle/background_2.png");
+    scene->setBackgroundBrush(QBrush(background)); // repete a imagem para preencher a cena
 
     // Jogador
     knight = new Player(120,750);
