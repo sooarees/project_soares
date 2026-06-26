@@ -21,6 +21,7 @@
 #include <QPixmap>
 #include <QPoint>
 #include <QScreen>
+#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QtGlobal>
@@ -174,6 +175,74 @@ private:
     QPixmap imagemIcone;
     int tamanhoDoIcone;
 };
+
+class MelhorTempoLabel : public QLabel
+{
+public:
+    explicit MelhorTempoLabel(QWidget *parent = nullptr)
+        : QLabel(parent)
+    {
+        setAttribute(Qt::WA_TranslucentBackground);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        Q_UNUSED(event);
+
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        QStringList linhas = text().split('\n');
+        if(linhas.size() < 2)
+        {
+            QLabel::paintEvent(event);
+            return;
+        }
+
+        const int contorno = 3;
+        QFontMetrics fonteMedidas(font());
+        QRect linhaTitulo(0,2,width(),34);
+        QRect linhaTempo(0,50,width(),34);
+
+        QPainterPath textoTitulo;
+        QRect areaTitulo = fonteMedidas.boundingRect(linhaTitulo, Qt::AlignCenter, linhas.at(0));
+        textoTitulo.addText(
+            areaTitulo.left(),
+            areaTitulo.top() + fonteMedidas.ascent(),
+            font(),
+            linhas.at(0)
+            );
+
+        QPainterPath textoTempo;
+        QRect areaTempo = fonteMedidas.boundingRect(linhaTempo, Qt::AlignCenter, linhas.at(1));
+        textoTempo.addText(
+            areaTempo.left(),
+            areaTempo.top() + fonteMedidas.ascent(),
+            font(),
+            linhas.at(1)
+            );
+
+        painter.setPen(QPen(Qt::black, contorno, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        painter.drawPath(textoTitulo);
+        painter.drawPath(textoTempo);
+
+        painter.fillPath(textoTitulo, QColor("#ffdf00"));
+        painter.fillPath(textoTempo, QColor("#ffdf00"));
+    }
+};
+
+QString formatarTempo(qint64 milissegundos)
+{
+    qint64 minutos = milissegundos / 60000;
+    qint64 segundos = (milissegundos % 60000) / 1000;
+    qint64 milesimos = milissegundos % 1000;
+
+    return QString("%1:%2:%3")
+        .arg(minutos, 2, 10, QChar('0'))
+        .arg(segundos, 2, 10, QChar('0'))
+        .arg(milesimos, 3, 10, QChar('0'));
+}
 }
 
 
@@ -225,22 +294,29 @@ void Menu::configurarInterface()
     }
 
     QFont fonteTitulo(familiaTitulo);
-    fonteTitulo.setPointSize(36);
+    fonteTitulo.setPointSize(44);
     fonteTitulo.setLetterSpacing(QFont::AbsoluteSpacing, 2);
 
     titulo->setFont(fonteTitulo);
 
 
 
-    melhorTempo = new QLabel(
-        "Melhor tempo:\n--:--:---"
-        );
+    QSettings configuracoes("Royal Knight", "Royal Knight");
+    qint64 melhorTempoMs = configuracoes.value("melhorTempoMs", -1).toLongLong();
+
+    melhorTempo = new MelhorTempoLabel();
+    if(melhorTempoMs >= 0)
+        melhorTempo->setText("Melhor tempo:\n" + formatarTempo(melhorTempoMs));
+    else
+        melhorTempo->setText("Melhor tempo:\n--:--:---");
 
     melhorTempo->setAlignment(Qt::AlignCenter);
+    melhorTempo->setMinimumHeight(100);
 
 
-    QFont fonteTempo;
-    fonteTempo.setPointSize(18);
+    QFont fonteTempo(familiaTitulo);
+    fonteTempo.setPointSize(17);
+    fonteTempo.setBold(true);
 
     melhorTempo->setFont(fonteTempo);
 

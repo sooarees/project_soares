@@ -5,6 +5,7 @@
 #include <QPixmap>
 
 class QPainter;
+class QPainterPath;
 class QStyleOptionGraphicsItem;
 class QWidget;
 
@@ -19,6 +20,9 @@ protected:
         const QStyleOptionGraphicsItem *option,
         QWidget *widget
         ) override;
+
+    QRectF boundingRect() const override;
+    QPainterPath shape() const override;
 
 private:
     QPixmap sprite;

@@ -13,6 +13,7 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QSettings>
 #include <QStringList>
 #include <QVBoxLayout>
 
@@ -372,14 +373,23 @@ void Game::ganharJogo()
     knight->clearFocus();
     knight->setFlag(QGraphicsItem::ItemIsFocusable, false);
 
-    QString tempoFinal = formatarTempo(cronometro.elapsed());
+    qint64 tempoFinalMs = cronometro.elapsed();
+    QString tempoFinal = formatarTempo(tempoFinalMs);
     if(labelCronometro)
         labelCronometro->setText(tempoFinal);
+
+    QSettings configuracoes("Royal Knight", "Royal Knight");
+    qint64 melhorTempoMs = configuracoes.value("melhorTempoMs", -1).toLongLong();
+    bool novoMelhorTempo = melhorTempoMs < 0 || tempoFinalMs < melhorTempoMs;
+
+    if(novoMelhorTempo)
+        configuracoes.setValue("melhorTempoMs", tempoFinalMs);
 
     QMessageBox::information(
         this,
         "Royal Knight",
-        QString("Voce resgatou a princesa!\nTempo: ") + tempoFinal
+        QString("Voce resgatou a princesa!\nTempo: ") + tempoFinal +
+            (novoMelhorTempo ? "\nNovo melhor tempo!" : "")
         );
 
     close();
