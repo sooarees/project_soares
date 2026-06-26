@@ -5,6 +5,7 @@
 
 class QPushButton;
 class QLabel;
+class QPaintEvent;
 
 
 class Menu : public QWidget
@@ -13,6 +14,9 @@ class Menu : public QWidget
 
 public:
     Menu();
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 
 private slots:
     void iniciarJogo();

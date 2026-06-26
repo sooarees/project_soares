@@ -3,10 +3,178 @@
 
 #include <QPushButton>
 #include <QLabel>
+#include <QColor>
+#include <QCursor>
+#include <QEvent>
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFont>
+#include <QFontDatabase>
+#include <QFontMetrics>
 #include <QGuiApplication>
+#include <QImage>
+#include <QLinearGradient>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPaintEvent>
+#include <QPen>
+#include <QPixmap>
+#include <QPoint>
 #include <QScreen>
+#include <QString>
+#include <QStringList>
+#include <QtGlobal>
+
+namespace
+{
+class TituloLabel : public QLabel
+{
+public:
+    explicit TituloLabel(const QString &texto, QWidget *parent = nullptr)
+        : QLabel(texto, parent)
+    {
+        setAttribute(Qt::WA_TranslucentBackground);
+    }
+
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        Q_UNUSED(event);
+
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        const int contorno = 5;
+        QFontMetrics fonteMedidas(font());
+        QRect areaTexto = fonteMedidas.boundingRect(
+            rect().adjusted(contorno, contorno, -contorno, -contorno),
+            alignment(),
+            text()
+            );
+
+        QPainterPath texto;
+        texto.addText(
+            areaTexto.left(),
+            areaTexto.top() + fonteMedidas.ascent(),
+            font(),
+            text()
+            );
+
+        QLinearGradient corTitulo(areaTexto.topLeft(), areaTexto.bottomLeft());
+        corTitulo.setColorAt(0.00, QColor("#46f3ff"));
+        corTitulo.setColorAt(0.42, QColor("#46f3ff"));
+        corTitulo.setColorAt(0.43, QColor("#fff7d8"));
+        corTitulo.setColorAt(0.68, QColor("#fff7d8"));
+        corTitulo.setColorAt(0.69, QColor("#ffb13b"));
+        corTitulo.setColorAt(0.84, QColor("#ffb13b"));
+        corTitulo.setColorAt(0.85, QColor("#e7473f"));
+        corTitulo.setColorAt(1.00, QColor("#e7473f"));
+
+        painter.setPen(QPen(Qt::black, contorno, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        painter.drawPath(texto);
+        painter.fillPath(texto, corTitulo);
+    }
+};
+
+class BotaoImagem : public QPushButton
+{
+public:
+    BotaoImagem(
+        const QString &normal,
+        const QString &hover,
+        const QString &pressed,
+        const QString &icone,
+        int tamanhoIcone,
+        QWidget *parent = nullptr
+        )
+        : QPushButton(parent),
+        imagemNormal(normal),
+        imagemHover(hover),
+        imagemPressed(pressed),
+        imagemIcone(icone),
+        tamanhoDoIcone(tamanhoIcone)
+    {
+        setText("");
+        setCursor(Qt::PointingHandCursor);
+        setFocusPolicy(Qt::NoFocus);
+        setMouseTracking(true);
+    }
+
+protected:
+    bool event(QEvent *event) override
+    {
+        if(event->type() == QEvent::Enter ||
+            event->type() == QEvent::Leave ||
+            event->type() == QEvent::MouseMove)
+        {
+            update();
+        }
+
+        return QPushButton::event(event);
+    }
+
+    bool hitButton(const QPoint &pos) const override
+    {
+        return pontoVisivel(pos);
+    }
+
+    void paintEvent(QPaintEvent *event) override
+    {
+        Q_UNUSED(event);
+
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+
+        QPixmap imagemBotao = imagemNormal;
+
+        if(isDown())
+            imagemBotao = imagemPressed;
+        else if(underMouse() && pontoVisivel(mapFromGlobal(QCursor::pos())))
+            imagemBotao = imagemHover;
+
+        painter.drawPixmap(rect(), imagemBotao);
+
+        QPixmap icone = imagemIcone.scaled(
+            tamanhoDoIcone,
+            tamanhoDoIcone,
+            Qt::KeepAspectRatio,
+            Qt::FastTransformation
+            );
+
+        QRect areaIcone(
+            (width() - icone.width()) / 2,
+            (height() - icone.height()) / 2,
+            icone.width(),
+            icone.height()
+            );
+
+        painter.drawPixmap(areaIcone, icone);
+    }
+
+private:
+    bool pontoVisivel(const QPoint &pos) const
+    {
+        if(!rect().contains(pos) || width() <= 0 || height() <= 0)
+            return false;
+
+        QImage imagem = imagemNormal.toImage();
+
+        int x = pos.x() * imagem.width() / width();
+        int y = pos.y() * imagem.height() / height();
+
+        x = qBound(0, x, imagem.width() - 1);
+        y = qBound(0, y, imagem.height() - 1);
+
+        return QColor::fromRgba(imagem.pixel(x,y)).alpha() > 10;
+    }
+
+    QPixmap imagemNormal;
+    QPixmap imagemHover;
+    QPixmap imagemPressed;
+    QPixmap imagemIcone;
+    int tamanhoDoIcone;
+};
+}
 
 
 Menu::Menu()
@@ -14,22 +182,51 @@ Menu::Menu()
     configurarInterface();
 }
 
+void Menu::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+
+    QPainter painter(this);
+    QPixmap background(":/Sprites/Game Images/Royal/Menu/background.png");
+
+    painter.drawPixmap(
+        rect(),
+        background,
+        background.rect()
+        );
+}
+
 
 void Menu::configurarInterface()
 {
 
     setFixedSize(800,600);
+    setWindowFlags(Qt::FramelessWindowHint);
 
     move(QGuiApplication::primaryScreen()->geometry().center() - rect().center());
 
-    titulo = new QLabel("ROYAL KNIGHT");
+    titulo = new TituloLabel("ROYAL KNIGHT");
 
     titulo->setAlignment(Qt::AlignCenter);
+    titulo->setMinimumHeight(80);
 
 
-    QFont fonteTitulo;
+    int idFonteTitulo = QFontDatabase::addApplicationFont(":/Sprites/Game Images/Royal/Menu/GravityBold8.ttf");
+    QString familiaTitulo = "Georgia";
+
+    if(idFonteTitulo != -1)
+    {
+        QStringList familias = QFontDatabase::applicationFontFamilies(idFonteTitulo);
+
+        if(!familias.isEmpty())
+        {
+            familiaTitulo = familias.first();
+        }
+    }
+
+    QFont fonteTitulo(familiaTitulo);
     fonteTitulo.setPointSize(36);
-    fonteTitulo.setBold(true);
+    fonteTitulo.setLetterSpacing(QFont::AbsoluteSpacing, 2);
 
     titulo->setFont(fonteTitulo);
 
@@ -48,15 +245,26 @@ void Menu::configurarInterface()
     melhorTempo->setFont(fonteTempo);
 
 
+    botaoJogar = new BotaoImagem(
+        ":/Sprites/Game Images/Royal/Menu/botao/Button_2_normal.png",
+        ":/Sprites/Game Images/Royal/Menu/botao/Button_02_hovered.png",
+        ":/Sprites/Game Images/Royal/Menu/botao/Button_02_pressed.png",
+        ":/Sprites/Game Images/Royal/Menu/botao/Play_Icon.png",
+        160
+        );
 
-    botaoJogar = new QPushButton("JOGAR");
+    botaoSair = new BotaoImagem(
+        ":/Sprites/Game Images/Royal/Menu/botao/Button_01_normal.png",
+        ":/Sprites/Game Images/Royal/Menu/botao/Button_01_hovered.png",
+        ":/Sprites/Game Images/Royal/Menu/botao/Button_01_pressed.png",
+        ":/Sprites/Game Images/Royal/Menu/botao/Exit_Icon.png",
+        160
+        );
 
-    botaoSair = new QPushButton("SAIR");
 
 
-
-    botaoJogar->setFixedSize(250,70);
-    botaoSair->setFixedSize(250,70);
+    botaoJogar->setFixedSize(192,192);
+    botaoSair->setFixedSize(192,230);
 
 
 
@@ -69,6 +277,11 @@ void Menu::configurarInterface()
 
 
     QVBoxLayout *layout = new QVBoxLayout();
+    QHBoxLayout *layoutBotoes = new QHBoxLayout();
+
+    layoutBotoes->addWidget(botaoSair);
+    layoutBotoes->addSpacing(35);
+    layoutBotoes->addWidget(botaoJogar);
 
 
     layout->addStretch();
@@ -77,13 +290,8 @@ void Menu::configurarInterface()
 
     layout->addSpacing(50);
 
-    layout->addWidget(botaoJogar,
-                      0,
-                      Qt::AlignCenter);
-
-    layout->addWidget(botaoSair,
-                      0,
-                      Qt::AlignCenter);
+    layout->addLayout(layoutBotoes);
+    layout->setAlignment(layoutBotoes, Qt::AlignCenter);
 
 
     layout->addSpacing(40);
