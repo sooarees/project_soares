@@ -8,6 +8,8 @@
 #include <QTimer>
 #include "elementofase.h"
 
+class PlataformaMovel;
+
 class Player: public QObject, public ElementoFase
 {
     Q_OBJECT
@@ -18,6 +20,7 @@ public:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void updateMovement();
+    void limparPlataformaMovel();
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -39,6 +42,7 @@ private:
 
     bool onGround;
     int coyoteFrames;
+    PlataformaMovel *plataformaMovelAtual;
 
     // timers
     QTimer *timer;

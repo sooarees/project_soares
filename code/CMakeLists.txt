@@ -25,6 +25,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         player.h player.cpp
         elementofase.h elementofase.cpp
         plataforma.h plataforma.cpp
+        plataforma_movel.h plataforma_movel.cpp
         res.qrc
         portal.h portal.cpp
         menu.h menu.cpp

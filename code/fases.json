@@ -3,51 +3,107 @@
         "1": {
             "spawn": { "x": 120, "y": 750 },
             "plataformas": [
-                { "x": 0, "y": 950, "width": 500, "height": 130 },
-                { "x": 700, "y": 950, "width": 1220, "height": 130 },
-                { "x": 250, "y": 850, "width": 150, "height": 20 },
-                { "x": 500, "y": 750, "width": 120, "height": 20 },
-                { "x": 700, "y": 650, "width": 120, "height": 20 },
-                { "x": 950, "y": 550, "width": 150, "height": 20 },
-                { "x": 1200, "y": 700, "width": 150, "height": 20 },
-                { "x": 1450, "y": 600, "width": 120, "height": 20 },
-                { "x": 1600, "y": 500, "width": 200, "height": 20 }
+                { "x": 0, "y": 950, "width": 1920, "height": 130 }
             ],
+            "plataformas_moveis": [],
             "portais": [
                 { "x": 1800, "y": 850, "destino": 2 }
             ],
-            "armadilhas": [
-                { "tipo": "espinho", "x": 900, "y": 910 },
-                { "tipo": "serra", "x": 1100, "y": 900 }
-            ]
+            "armadilhas": []
         },
         "2": {
-            "spawn": { "x": 100, "y": 750 },
+            "spawn": { "x": 120, "y": 750 },
             "plataformas": [
-                { "x": 0, "y": 950, "width": 1920, "height": 130 },
-                { "x": 800, "y": 700, "width": 200, "height": 20 }
+                { "x": 0, "y": 950, "width": 700, "height": 130 },
+                { "x": 900, "y": 950, "width": 1020, "height": 130 }
             ],
+            "plataformas_moveis": [],
             "portais": [
                 { "x": 1800, "y": 850, "destino": 3 }
             ],
-            "princesa": { "x": 1600, "y": 880 },
             "armadilhas": []
         },
         "3": {
-            "spawn": { "x": 100, "y": 750 },
+            "spawn": { "x": 120, "y": 750 },
             "plataformas": [
-                { "x": 0, "y": 950, "width": 500, "height": 130 },
-                { "x": 650, "y": 850, "width": 180, "height": 20 },
-                { "x": 980, "y": 720, "width": 180, "height": 20 },
-                { "x": 1320, "y": 600, "width": 180, "height": 20 },
-                { "x": 1650, "y": 950, "width": 270, "height": 130 }
+                { "x": 0, "y": 950, "width": 520, "height": 130 },
+                { "x": 780, "y": 830, "width": 180, "height": 20 },
+                { "x": 1220, "y": 950, "width": 700, "height": 130 }
+            ],
+            "plataformas_moveis": [],
+            "portais": [
+                { "x": 1800, "y": 850, "destino": 4 }
+            ],
+            "armadilhas": []
+        },
+        "4": {
+            "spawn": { "x": 120, "y": 750 },
+            "plataformas": [
+                { "x": 0, "y": 950, "width": 420, "height": 130 },
+                { "x": 1500, "y": 950, "width": 420, "height": 130 }
+            ],
+            "plataformas_moveis": [
+                { "x": 520, "y": 850, "width": 170, "height": 20, "fimX": 850, "fimY": 850, "velocidade": 2 },
+                { "x": 1050, "y": 850, "width": 170, "height": 20, "fimX": 1050, "fimY": 650, "velocidade": 2 }
             ],
             "portais": [
-                { "x": 1800, "y": 850, "destino": 1 }
+                { "x": 1800, "y": 850, "destino": 5 }
+            ],
+            "armadilhas": []
+        },
+        "5": {
+            "spawn": { "x": 120, "y": 750 },
+            "plataformas": [
+                { "x": 0, "y": 950, "width": 1920, "height": 130 },
+                { "x": 650, "y": 820, "width": 180, "height": 20 },
+                { "x": 1020, "y": 720, "width": 180, "height": 20 },
+                { "x": 1380, "y": 820, "width": 180, "height": 20 }
+            ],
+            "plataformas_moveis": [],
+            "portais": [
+                { "x": 1800, "y": 850, "destino": 6 }
             ],
             "armadilhas": [
-                { "tipo": "espinho", "x": 720, "y": 810 },
-                { "tipo": "serra", "x": 1120, "y": 670 }
+                { "tipo": "espinho", "x": 880, "y": 910 }
+            ]
+        },
+        "6": {
+            "spawn": { "x": 120, "y": 750 },
+            "plataformas": [
+                { "x": 0, "y": 950, "width": 460, "height": 130 },
+                { "x": 730, "y": 780, "width": 180, "height": 20 },
+                { "x": 1190, "y": 680, "width": 180, "height": 20 },
+                { "x": 1580, "y": 950, "width": 340, "height": 130 }
+            ],
+            "plataformas_moveis": [
+                { "x": 500, "y": 860, "width": 160, "height": 20, "fimX": 500, "fimY": 680, "velocidade": 2 },
+                { "x": 960, "y": 760, "width": 160, "height": 20, "fimX": 1260, "fimY": 760, "velocidade": 2 }
+            ],
+            "portais": [
+                { "x": 1800, "y": 850, "destino": 7 }
+            ],
+            "armadilhas": [
+                { "tipo": "espinho", "x": 620, "y": 910 },
+                { "tipo": "serra", "x": 1400, "y": 900 }
+            ]
+        },
+        "7": {
+            "spawn": { "x": 120, "y": 750 },
+            "plataformas": [
+                { "x": 0, "y": 950, "width": 380, "height": 130 },
+                { "x": 520, "y": 830, "width": 160, "height": 20 },
+                { "x": 820, "y": 710, "width": 160, "height": 20 },
+                { "x": 1120, "y": 590, "width": 160, "height": 20 },
+                { "x": 1460, "y": 950, "width": 460, "height": 130 }
+            ],
+            "plataformas_moveis": [
+                { "x": 1320, "y": 700, "width": 160, "height": 20, "fimX": 1320, "fimY": 860, "velocidade": 2 }
+            ],
+            "portais": [],
+            "princesa": { "x": 1660, "y": 880 },
+            "armadilhas": [
+                { "tipo": "espinho", "x": 700, "y": 910 },
+                { "tipo": "serra", "x": 980, "y": 660 }
             ]
         }
     }

@@ -14,6 +14,7 @@ class QPushButton;
 #include "player.h"
 #include "plataforma.h"
 #include "portal.h"
+#include "plataforma_movel.h"
 #include "hud.h"
 #include "armadilha.h"
 #include "espinho.h"

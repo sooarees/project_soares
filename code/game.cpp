@@ -222,6 +222,7 @@ void Game::update()
 
 void Game::carregarFase(int fase)
 {
+    knight->limparPlataformaMovel();
     scene->removeItem(knight);
     scene->clear();
 
@@ -261,6 +262,20 @@ void Game::carregarFase(int fase)
             valor(plataforma, "y"),
             valor(plataforma, "width"),
             valor(plataforma, "height")
+            ));
+    }
+
+    for(const QJsonValue &valorPlataforma : dadosFase.value("plataformas_moveis").toArray())
+    {
+        QJsonObject plataforma = valorPlataforma.toObject();
+        scene->addItem(new PlataformaMovel(
+            valor(plataforma, "x"),
+            valor(plataforma, "y"),
+            valor(plataforma, "width"),
+            valor(plataforma, "height"),
+            valor(plataforma, "fimX"),
+            valor(plataforma, "fimY"),
+            valor(plataforma, "velocidade", 2)
             ));
     }
 

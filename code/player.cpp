@@ -1,6 +1,7 @@
 #include "player.h"
 #include "elementofase.h"
 #include "plataforma.h"
+#include "plataforma_movel.h"
 #include "portal.h"
 #include <QKeyEvent>
 #include <QGraphicsScene>
@@ -10,6 +11,7 @@
 namespace
 {
 const int coyoteFramesMax = 8;
+const qreal fatorPlataformaMovelAndando = 0.0;
 }
 
 Player::Player(qreal x, qreal y): ElementoFase(x,y,51,96)
@@ -24,6 +26,7 @@ Player::Player(qreal x, qreal y): ElementoFase(x,y,51,96)
 
     onGround = false;
     coyoteFrames = 0;
+    plataformaMovelAtual = nullptr;
     facingRight = true; // comeca olhando pra direita
 
     // carrega as spritesheets
@@ -206,6 +209,19 @@ void Player::updateMovement()
     const qreal gravity = 0.6;
     const qreal speed   = 6;
 
+    if(onGround && plataformaMovelAtual)
+    {
+        QPointF deslocamento = plataformaMovelAtual->deslocamentoUltimoFrame();
+        bool andandoHorizontalmente = leftPressed || rightPressed;
+
+        if(andandoHorizontalmente)
+            deslocamento.setX(deslocamento.x() * fatorPlataformaMovelAndando);
+
+        setPos(pos() + deslocamento);
+    }
+
+    plataformaMovelAtual = nullptr;
+
     // horizontal
     veloX = 0;
     if(leftPressed)
@@ -275,6 +291,7 @@ void Player::updateMovement()
             veloY = 0;
             onGround = true;
             coyoteFrames = coyoteFramesMax;
+            plataformaMovelAtual = dynamic_cast<PlataformaMovel*>(plat);
         }
         // Player estava abaixo, bate no teto
         else if(prevTop >= platBottom && veloY < 0)
@@ -349,4 +366,9 @@ void Player::updateMovement()
         setAnimation(nextState);
     }
 
+}
+
+void Player::limparPlataformaMovel()
+{
+    plataformaMovelAtual = nullptr;
 }
