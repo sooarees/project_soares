@@ -1,4 +1,3 @@
-
 #ifndef PORTAL_H
 #define PORTAL_H
 
@@ -20,12 +19,11 @@ protected:
     void paint(
         QPainter *painter,
         const QStyleOptionGraphicsItem *option,
-        QWidget *widget
-        ) override;
+        QWidget *widget) override;
 
 private:
     int faseDestino;
     QPixmap sprite;
 };
 
-#endif
+#endif // PORTAL_H

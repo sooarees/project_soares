@@ -17,8 +17,7 @@ public:
         qreal height,
         qreal fimX,
         qreal fimY,
-        qreal velocidade
-        );
+        qreal velocidade);
 
     QPointF deslocamentoUltimoFrame() const;
 
@@ -33,4 +32,4 @@ private:
     void atualizarMovimento();
 };
 
-#endif
+#endif // PLATAFORMA_MOVEL_H

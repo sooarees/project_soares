@@ -1,22 +1,27 @@
 #include "Game.h"
 #include "armadilha.h"
 #include "fase.h"
+#include "hud.h"
+#include "player.h"
 #include "portal.h"
 #include "princesa.h"
 #include "tempo.h"
+#include <QAudioOutput>
 #include <QBrush>
 #include <QFontDatabase>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QLabel>
 #include <QMediaPlayer>
-#include <QPainter>
+#include <QMessageBox>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QPen>
 #include <QPixmap>
 #include <QPushButton>
-#include <QAudioOutput>
-#include <QMessageBox>
 #include <QSettings>
 #include <QStringList>
+#include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
 
@@ -56,9 +61,10 @@ protected:
         painter.drawText(rect(), alignment(), text());
     }
 };
-}
+} // namespace
 
-Game::Game(QWidget *parent): QWidget(parent)
+Game::Game(QWidget *parent)
+    : QWidget(parent)
 {
     configurarCena();
     configurarJogador();
@@ -66,7 +72,7 @@ Game::Game(QWidget *parent): QWidget(parent)
     configurarView();
 
     showFullScreen();
-    //showMaximized();
+    // showMaximized();
 
     configurarHud();
     configurarBotaoFechar();
@@ -84,7 +90,7 @@ Game::~Game()
 void Game::configurarCena()
 {
     scene = new QGraphicsScene(this);
-    scene->setSceneRect(0,0,larguraCena,alturaCena);
+    scene->setSceneRect(0, 0, larguraCena, alturaCena);
 
     QPixmap background(":/Sprites/Game Images/Royal/Castle/background.png");
     scene->setBackgroundBrush(QBrush(background)); // repete a imagem para preencher a cena
@@ -119,7 +125,7 @@ void Game::configurarView()
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QVBoxLayout *layout = new QVBoxLayout();
-    layout->setContentsMargins(0,0,0,0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(view);
 
     setLayout(layout);
@@ -130,7 +136,7 @@ void Game::configurarHud()
     vidas = vidasMaximas;
 
     hud = new HUD(this);
-    hud->setGeometry(20,20,220,60);
+    hud->setGeometry(20, 20, 220, 60);
     hud->show();
     hud->raise();
 }
@@ -138,7 +144,7 @@ void Game::configurarHud()
 void Game::configurarBotaoFechar()
 {
     botaoFechar = new QPushButton("X", this);
-    botaoFechar->setFixedSize(28,28);
+    botaoFechar->setFixedSize(28, 28);
     botaoFechar->setFocusPolicy(Qt::NoFocus);
     botaoFechar->setStyleSheet(
         "QPushButton {"
@@ -149,8 +155,7 @@ void Game::configurarBotaoFechar()
         "}"
         "QPushButton:hover {"
         "background-color: rgba(180, 40, 40, 220);"
-        "}"
-        );
+        "}");
     botaoFechar->show();
     botaoFechar->raise();
 
@@ -160,17 +165,17 @@ void Game::configurarBotaoFechar()
 void Game::configurarCronometro()
 {
     labelCronometro = new CronometroLabel(this);
-    labelCronometro->setFixedSize(220,60);
+    labelCronometro->setFixedSize(220, 60);
     labelCronometro->setAlignment(Qt::AlignCenter);
 
     int idFonteCronometro = QFontDatabase::addApplicationFont(":/Sprites/Game Images/Royal/Menu/GravityBold8.ttf");
     QString familiaCronometro = "Georgia";
 
-    if(idFonteCronometro != -1)
+    if (idFonteCronometro != -1)
     {
         QStringList familias = QFontDatabase::applicationFontFamilies(idFonteCronometro);
 
-        if(!familias.isEmpty())
+        if (!familias.isEmpty())
             familiaCronometro = familias.first();
     }
 
@@ -210,32 +215,31 @@ void Game::iniciarGameLoop()
 
 void Game::reposicionarInterface()
 {
-    if(view)
+    if (view)
     {
         view->fitInView(
             scene->sceneRect(),
-            Qt::KeepAspectRatio
-            );
+            Qt::KeepAspectRatio);
 
         view->centerOn(scene->sceneRect().center());
     }
 
-    if(hud && view)
+    if (hud && view)
     {
         int margemX = (width() - view->viewport()->width()) / 2;
-        hud->move(margemX + 20,20);
+        hud->move(margemX + 20, 20);
         hud->raise();
     }
 
-    if(labelCronometro)
+    if (labelCronometro)
     {
-        labelCronometro->move(width() - labelCronometro->width() - 20,20);
+        labelCronometro->move(width() - labelCronometro->width() - 20, 20);
         labelCronometro->raise();
     }
 
-    if(botaoFechar)
+    if (botaoFechar)
     {
-        botaoFechar->move((width() - botaoFechar->width()) / 2,20);
+        botaoFechar->move((width() - botaoFechar->width()) / 2, 20);
         botaoFechar->raise();
     }
 }
@@ -250,24 +254,24 @@ void Game::atualizarJogo()
 
 void Game::verificarColisoes()
 {
-    for(QGraphicsItem *item : knight->collidingItems())
+    for (QGraphicsItem *item : knight->collidingItems())
     {
-        Portal *portal = dynamic_cast<Portal*>(item);
-        if(portal)
+        Portal *portal = dynamic_cast<Portal *>(item);
+        if (portal)
         {
             colidirComPortal(portal);
             return;
         }
 
-        Princesa *princesa = dynamic_cast<Princesa*>(item);
-        if(princesa)
+        Princesa *princesa = dynamic_cast<Princesa *>(item);
+        if (princesa)
         {
             colidirComPrincesa();
             return;
         }
 
-        Armadilha *armadilha = dynamic_cast<Armadilha*>(item);
-        if(armadilha)
+        Armadilha *armadilha = dynamic_cast<Armadilha *>(item);
+        if (armadilha)
         {
             colidirComArmadilha(armadilha);
             return;
@@ -290,13 +294,13 @@ void Game::colidirComPrincesa()
 
 void Game::colidirComArmadilha(Armadilha *armadilha)
 {
-    if(armadilha->causaDano())
+    if (armadilha->causaDano())
         perderVida();
 }
 
 void Game::verificarQueda()
 {
-    if(knight->y() > limiteQueda)
+    if (knight->y() > limiteQueda)
     {
         perderVida();
     }
@@ -317,7 +321,7 @@ void Game::perderVida()
 {
     vidas--;
 
-    if(vidas <= 0)
+    if (vidas <= 0)
     {
         reiniciarJogo();
         return;
@@ -329,7 +333,7 @@ void Game::perderVida()
 
 void Game::ganharVida()
 {
-    if(vidas < 5)
+    if (vidas < 5)
     {
         vidas++;
 
@@ -340,7 +344,7 @@ void Game::ganharVida()
 void Game::ganharJogo()
 {
     gameTimer->stop();
-    if(cronometroTimer)
+    if (cronometroTimer)
         cronometroTimer->stop();
 
     knight->clearFocus();
@@ -348,22 +352,21 @@ void Game::ganharJogo()
 
     qint64 tempoFinalMs = cronometro.elapsed();
     QString tempoFinal = formatarTempo(tempoFinalMs);
-    if(labelCronometro)
+    if (labelCronometro)
         labelCronometro->setText(tempoFinal);
 
     QSettings configuracoes("Royal Knight", "Royal Knight");
     qint64 melhorTempoMs = configuracoes.value("melhorTempoMs", -1).toLongLong();
     bool novoMelhorTempo = melhorTempoMs < 0 || tempoFinalMs < melhorTempoMs;
 
-    if(novoMelhorTempo)
+    if (novoMelhorTempo)
         configuracoes.setValue("melhorTempoMs", tempoFinalMs);
 
     QMessageBox::information(
         this,
         "Royal Knight",
         QString("Voce resgatou a princesa!\nTempo: ") + tempoFinal +
-            (novoMelhorTempo ? "\nNovo melhor tempo!" : "")
-        );
+            (novoMelhorTempo ? "\nNovo melhor tempo!" : ""));
 
     close();
 }
@@ -382,7 +385,7 @@ void Game::reiniciarJogo()
 
 void Game::atualizarCronometro()
 {
-    if(!labelCronometro)
+    if (!labelCronometro)
         return;
 
     labelCronometro->setText(formatarTempo(cronometro.elapsed()));

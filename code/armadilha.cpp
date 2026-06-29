@@ -1,6 +1,7 @@
 #include "armadilha.h"
 
-Armadilha::Armadilha(qreal x, qreal y, qreal width, qreal height): ElementoFase(x,y,width,height)
+Armadilha::Armadilha(qreal x, qreal y, qreal width, qreal height)
+    : ElementoFase(x, y, width, height)
 {
 }
 

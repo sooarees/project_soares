@@ -3,10 +3,10 @@
 
 #include <QWidget>
 
-class QPushButton;
 class QLabel;
+class QKeyEvent;
 class QPaintEvent;
-
+class QPushButton;
 
 class Menu : public QWidget
 {
@@ -16,13 +16,13 @@ public:
     Menu();
 
 protected:
+    void keyPressEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
 private slots:
     void iniciarJogo();
 
 private:
-
     QLabel *titulo;
     QLabel *melhorTempo;
 
@@ -32,5 +32,4 @@ private:
     void configurarInterface();
 };
 
-
-#endif
+#endif // MENU_H

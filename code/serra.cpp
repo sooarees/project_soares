@@ -10,7 +10,7 @@ const int tamanhoSerra = 130;
 }
 
 Serra::Serra(qreal x, qreal y)
-    : Armadilha(x,y-85,tamanhoSerra,tamanhoSerra)
+    : Armadilha(x, y, tamanhoSerra, tamanhoSerra)
 {
     sprite.load(":/Sprites/Game Images/Royal/Armadilhas/serra.png");
 }
@@ -22,8 +22,7 @@ QPainterPath Serra::shape() const
         rect().center().x() - diametro / 2,
         rect().center().y() - diametro / 2,
         diametro,
-        diametro
-        );
+        diametro);
 
     QPainterPath path;
     path.addEllipse(circulo);
@@ -44,9 +43,7 @@ void Serra::paint(
     const int frame = (QDateTime::currentMSecsSinceEpoch() / 25) % totalFrames;
 
     painter->drawPixmap(
-        QRectF(0,0,tamanhoSerra,tamanhoSerra),
+        QRectF(0, 0, tamanhoSerra, tamanhoSerra),
         sprite,
-        QRectF(frame * frameWidth,0,frameWidth,frameHeight)
-        );
-
+        QRectF(frame * frameWidth, 0, frameWidth, frameHeight));
 }

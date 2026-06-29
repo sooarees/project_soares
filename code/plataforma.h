@@ -10,9 +10,16 @@ class QWidget;
 class Plataforma : public ElementoFase
 {
 public:
-    Plataforma(qreal x, qreal y, qreal width, qreal height);
+    Plataforma(
+        qreal x,
+        qreal y,
+        qreal width,
+        qreal height);
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void paint(QPainter
+                   *painter,
+               const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
 };
 
 #endif // PLATAFORMA_H

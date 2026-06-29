@@ -5,7 +5,6 @@
 #include <QPixmap>
 
 class QPainter;
-class QPainterPath;
 class QStyleOptionGraphicsItem;
 class QWidget;
 
@@ -18,14 +17,10 @@ protected:
     void paint(
         QPainter *painter,
         const QStyleOptionGraphicsItem *option,
-        QWidget *widget
-        ) override;
-
-    QRectF boundingRect() const override;
-    QPainterPath shape() const override;
+        QWidget *widget) override;
 
 private:
     QPixmap sprite;
 };
 
-#endif
+#endif // PRINCESA_H

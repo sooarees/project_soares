@@ -29,7 +29,7 @@ int Fase::carregar(int numeroFase)
     scene->clear();
 
     QFile arquivo(":/Fases/fases.json");
-    if(!arquivo.open(QIODevice::ReadOnly))
+    if (!arquivo.open(QIODevice::ReadOnly))
     {
         jogador->setPos(spawnPadraoX, spawnPadraoY);
         scene->addItem(jogador);
@@ -41,7 +41,7 @@ int Fase::carregar(int numeroFase)
     QJsonObject fases = documento.object().value("fases").toObject();
     QJsonObject dadosFase = fases.value(QString::number(numeroFase)).toObject();
 
-    if(dadosFase.isEmpty())
+    if (dadosFase.isEmpty())
     {
         numeroFase = 1;
         dadosFase = fases.value("1").toObject();
@@ -64,21 +64,20 @@ qreal Fase::valor(const QJsonObject &objeto, const QString &chave, qreal padrao)
 
 void Fase::adicionarPlataformas(const QJsonObject &dadosFase)
 {
-    for(const QJsonValue &valorPlataforma : dadosFase.value("plataformas").toArray())
+    for (const QJsonValue &valorPlataforma : dadosFase.value("plataformas").toArray())
     {
         QJsonObject plataforma = valorPlataforma.toObject();
         scene->addItem(new Plataforma(
             valor(plataforma, "x"),
             valor(plataforma, "y"),
             valor(plataforma, "width"),
-            valor(plataforma, "height")
-            ));
+            valor(plataforma, "height")));
     }
 }
 
 void Fase::adicionarPlataformasMoveis(const QJsonObject &dadosFase)
 {
-    for(const QJsonValue &valorPlataforma : dadosFase.value("plataformas_moveis").toArray())
+    for (const QJsonValue &valorPlataforma : dadosFase.value("plataformas_moveis").toArray())
     {
         QJsonObject plataforma = valorPlataforma.toObject();
         scene->addItem(new PlataformaMovel(
@@ -88,34 +87,32 @@ void Fase::adicionarPlataformasMoveis(const QJsonObject &dadosFase)
             valor(plataforma, "height"),
             valor(plataforma, "fimX"),
             valor(plataforma, "fimY"),
-            valor(plataforma, "velocidade", 2)
-            ));
+            valor(plataforma, "velocidade", 2)));
     }
 }
 
 void Fase::adicionarPortais(const QJsonObject &dadosFase)
 {
-    for(const QJsonValue &valorPortal : dadosFase.value("portais").toArray())
+    for (const QJsonValue &valorPortal : dadosFase.value("portais").toArray())
     {
         QJsonObject portal = valorPortal.toObject();
         scene->addItem(new Portal(
             valor(portal, "x"),
             valor(portal, "y"),
-            portal.value("destino").toInt(1)
-            ));
+            portal.value("destino").toInt(1)));
     }
 }
 
 void Fase::adicionarArmadilhas(const QJsonObject &dadosFase)
 {
-    for(const QJsonValue &valorArmadilha : dadosFase.value("armadilhas").toArray())
+    for (const QJsonValue &valorArmadilha : dadosFase.value("armadilhas").toArray())
     {
         QJsonObject armadilha = valorArmadilha.toObject();
         QString tipo = armadilha.value("tipo").toString();
 
-        if(tipo == "espinho")
+        if (tipo == "espinho")
             scene->addItem(new Espinho(valor(armadilha, "x"), valor(armadilha, "y")));
-        else if(tipo == "serra")
+        else if (tipo == "serra")
             scene->addItem(new Serra(valor(armadilha, "x"), valor(armadilha, "y")));
     }
 }
@@ -123,13 +120,12 @@ void Fase::adicionarArmadilhas(const QJsonObject &dadosFase)
 void Fase::adicionarPrincesa(const QJsonObject &dadosFase)
 {
     QJsonObject princesa = dadosFase.value("princesa").toObject();
-    if(princesa.isEmpty())
+    if (princesa.isEmpty())
         return;
 
     scene->addItem(new Princesa(
         valor(princesa, "x"),
-        valor(princesa, "y")
-        ));
+        valor(princesa, "y")));
 }
 
 void Fase::posicionarJogador(const QJsonObject &dadosFase)

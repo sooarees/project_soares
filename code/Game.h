@@ -1,23 +1,22 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <QWidget>
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QTimer>
 #include <QElapsedTimer>
-#include <QString>
+#include <QWidget>
 
-class QLabel;
-class QPushButton;
-class QAudioOutput;
-class QMediaPlayer;
-class Fase;
-class Portal;
 class Armadilha;
-
-#include "player.h"
-#include "hud.h"
+class Fase;
+class HUD;
+class QLabel;
+class QAudioOutput;
+class QGraphicsScene;
+class QGraphicsView;
+class QMediaPlayer;
+class QPushButton;
+class QResizeEvent;
+class QTimer;
+class Portal;
+class Player;
 
 class Game : public QWidget
 {
@@ -70,6 +69,7 @@ private:
     HUD *hud = nullptr;
     QPushButton *botaoFechar = nullptr;
     int vidas = 0;
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 };

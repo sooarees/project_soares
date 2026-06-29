@@ -2,29 +2,30 @@
 #include "Game.h"
 #include "tempo.h"
 
-#include <QPushButton>
-#include <QLabel>
 #include <QColor>
 #include <QCursor>
 #include <QEvent>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QFont>
 #include <QFontDatabase>
 #include <QFontMetrics>
 #include <QGuiApplication>
+#include <QHBoxLayout>
 #include <QImage>
+#include <QKeyEvent>
+#include <QLabel>
 #include <QLinearGradient>
+#include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
-#include <QPaintEvent>
 #include <QPen>
 #include <QPixmap>
 #include <QPoint>
+#include <QPushButton>
 #include <QScreen>
 #include <QSettings>
 #include <QString>
 #include <QStringList>
+#include <QVBoxLayout>
 #include <QtGlobal>
 
 namespace
@@ -52,16 +53,14 @@ protected:
         QRect areaTexto = fonteMedidas.boundingRect(
             rect().adjusted(contorno, contorno, -contorno, -contorno),
             alignment(),
-            text()
-            );
+            text());
 
         QPainterPath texto;
         texto.addText(
             areaTexto.left(),
             areaTexto.top() + fonteMedidas.ascent(),
             font(),
-            text()
-            );
+            text());
 
         QLinearGradient corTitulo(areaTexto.topLeft(), areaTexto.bottomLeft());
         corTitulo.setColorAt(0.00, QColor("#46f3ff"));
@@ -89,14 +88,13 @@ public:
         const QString &pressed,
         const QString &icone,
         int tamanhoIcone,
-        QWidget *parent = nullptr
-        )
+        QWidget *parent = nullptr)
         : QPushButton(parent),
-        imagemNormal(normal),
-        imagemHover(hover),
-        imagemPressed(pressed),
-        imagemIcone(icone),
-        tamanhoDoIcone(tamanhoIcone)
+          imagemNormal(normal),
+          imagemHover(hover),
+          imagemPressed(pressed),
+          imagemIcone(icone),
+          tamanhoDoIcone(tamanhoIcone)
     {
         setText("");
         setCursor(Qt::PointingHandCursor);
@@ -107,7 +105,7 @@ public:
 protected:
     bool event(QEvent *event) override
     {
-        if(event->type() == QEvent::Enter ||
+        if (event->type() == QEvent::Enter ||
             event->type() == QEvent::Leave ||
             event->type() == QEvent::MouseMove)
         {
@@ -131,9 +129,9 @@ protected:
 
         QPixmap imagemBotao = imagemNormal;
 
-        if(isDown())
+        if (isDown())
             imagemBotao = imagemPressed;
-        else if(underMouse() && pontoVisivel(mapFromGlobal(QCursor::pos())))
+        else if (underMouse() && pontoVisivel(mapFromGlobal(QCursor::pos())))
             imagemBotao = imagemHover;
 
         painter.drawPixmap(rect(), imagemBotao);
@@ -142,15 +140,13 @@ protected:
             tamanhoDoIcone,
             tamanhoDoIcone,
             Qt::KeepAspectRatio,
-            Qt::FastTransformation
-            );
+            Qt::FastTransformation);
 
         QRect areaIcone(
             (width() - icone.width()) / 2,
             (height() - icone.height()) / 2,
             icone.width(),
-            icone.height()
-            );
+            icone.height());
 
         painter.drawPixmap(areaIcone, icone);
     }
@@ -158,7 +154,7 @@ protected:
 private:
     bool pontoVisivel(const QPoint &pos) const
     {
-        if(!rect().contains(pos) || width() <= 0 || height() <= 0)
+        if (!rect().contains(pos) || width() <= 0 || height() <= 0)
             return false;
 
         QImage imagem = imagemNormal.toImage();
@@ -169,7 +165,7 @@ private:
         x = qBound(0, x, imagem.width() - 1);
         y = qBound(0, y, imagem.height() - 1);
 
-        return QColor::fromRgba(imagem.pixel(x,y)).alpha() > 10;
+        return QColor::fromRgba(imagem.pixel(x, y)).alpha() > 10;
     }
 
     QPixmap imagemNormal;
@@ -198,7 +194,7 @@ protected:
         painter.setRenderHint(QPainter::Antialiasing);
 
         QStringList linhas = text().split('\n');
-        if(linhas.size() < 2)
+        if (linhas.size() < 2)
         {
             QLabel::paintEvent(event);
             return;
@@ -206,8 +202,8 @@ protected:
 
         const int contorno = 3;
         QFontMetrics fonteMedidas(font());
-        QRect linhaTitulo(0,2,width(),34);
-        QRect linhaTempo(0,50,width(),34);
+        QRect linhaTitulo(0, 2, width(), 34);
+        QRect linhaTempo(0, 50, width(), 34);
 
         QPainterPath textoTitulo;
         QRect areaTitulo = fonteMedidas.boundingRect(linhaTitulo, Qt::AlignCenter, linhas.at(0));
@@ -215,8 +211,7 @@ protected:
             areaTitulo.left(),
             areaTitulo.top() + fonteMedidas.ascent(),
             font(),
-            linhas.at(0)
-            );
+            linhas.at(0));
 
         QPainterPath textoTempo;
         QRect areaTempo = fonteMedidas.boundingRect(linhaTempo, Qt::AlignCenter, linhas.at(1));
@@ -224,8 +219,7 @@ protected:
             areaTempo.left(),
             areaTempo.top() + fonteMedidas.ascent(),
             font(),
-            linhas.at(1)
-            );
+            linhas.at(1));
 
         painter.setPen(QPen(Qt::black, contorno, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
         painter.drawPath(textoTitulo);
@@ -236,12 +230,27 @@ protected:
     }
 };
 
-}
+} // namespace
 
 // Implementacao do Menu.
 Menu::Menu()
 {
     configurarInterface();
+}
+
+void Menu::keyPressEvent(QKeyEvent *event)
+{
+    // TESTE: atalho temporario para resetar o melhor tempo durante o desenvolvimento.
+    if (event->key() == Qt::Key_R)
+    {
+        QSettings configuracoes("Royal Knight", "Royal Knight");
+        configuracoes.remove("melhorTempoMs");
+
+        melhorTempo->setText("Melhor tempo:\n--:--:---");
+        return;
+    }
+
+    QWidget::keyPressEvent(event);
 }
 
 void Menu::paintEvent(QPaintEvent *event)
@@ -254,14 +263,14 @@ void Menu::paintEvent(QPaintEvent *event)
     painter.drawPixmap(
         rect(),
         background,
-        background.rect()
-        );
+        background.rect());
 }
 
 void Menu::configurarInterface()
 {
-    setFixedSize(800,600);
+    setFixedSize(800, 600);
     setWindowFlags(Qt::FramelessWindowHint);
+    setFocusPolicy(Qt::StrongFocus);
 
     move(QGuiApplication::primaryScreen()->geometry().center() - rect().center());
 
@@ -274,11 +283,11 @@ void Menu::configurarInterface()
     int idFonteTitulo = QFontDatabase::addApplicationFont(":/Sprites/Game Images/Royal/Menu/GravityBold8.ttf");
     QString familiaTitulo = "Georgia";
 
-    if(idFonteTitulo != -1)
+    if (idFonteTitulo != -1)
     {
         QStringList familias = QFontDatabase::applicationFontFamilies(idFonteTitulo);
 
-        if(!familias.isEmpty())
+        if (!familias.isEmpty())
         {
             familiaTitulo = familias.first();
         }
@@ -295,10 +304,14 @@ void Menu::configurarInterface()
     qint64 melhorTempoMs = configuracoes.value("melhorTempoMs", -1).toLongLong();
 
     melhorTempo = new MelhorTempoLabel();
-    if(melhorTempoMs >= 0)
+    if (melhorTempoMs >= 0)
+    {
         melhorTempo->setText("Melhor tempo:\n" + formatarTempo(melhorTempoMs));
+    }
     else
+    {
         melhorTempo->setText("Melhor tempo:\n--:--:---");
+    }
 
     melhorTempo->setAlignment(Qt::AlignCenter);
     melhorTempo->setMinimumHeight(100);
@@ -315,19 +328,17 @@ void Menu::configurarInterface()
         ":/Sprites/Game Images/Royal/Menu/botao/Button_02_hovered.png",
         ":/Sprites/Game Images/Royal/Menu/botao/Button_02_pressed.png",
         ":/Sprites/Game Images/Royal/Menu/botao/Play_Icon.png",
-        160
-        );
+        160);
 
     botaoSair = new BotaoImagem(
         ":/Sprites/Game Images/Royal/Menu/botao/Button_01_normal.png",
         ":/Sprites/Game Images/Royal/Menu/botao/Button_01_hovered.png",
         ":/Sprites/Game Images/Royal/Menu/botao/Button_01_pressed.png",
         ":/Sprites/Game Images/Royal/Menu/botao/Exit_Icon.png",
-        160
-        );
+        160);
 
-    botaoJogar->setFixedSize(192,192);
-    botaoSair->setFixedSize(192,230);
+    botaoJogar->setFixedSize(192, 192);
+    botaoSair->setFixedSize(192, 230);
 
     QFont fonteBotao;
     fonteBotao.setPointSize(20);

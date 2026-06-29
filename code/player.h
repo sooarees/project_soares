@@ -1,21 +1,23 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <QGraphicsRectItem>
-#include <QObject>
-#include <QKeyEvent>
-#include <QPainterPath>
-#include <QTimer>
 #include "elementofase.h"
+#include <QObject>
+#include <QPixmap>
 
+class QKeyEvent;
+class QPainter;
+class QStyleOptionGraphicsItem;
+class QTimer;
+class QWidget;
 class PlataformaMovel;
 
-class Player: public QObject, public ElementoFase
+class Player : public QObject, public ElementoFase
 {
     Q_OBJECT
 
 public:
-    Player (qreal x, qreal y);
+    Player(qreal x, qreal y);
 
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -25,13 +27,11 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
     QRectF boundingRect() const override;
-    QPainterPath shape() const override;
 
 private slots:
     void advanceAnimation();
 
 private:
-
     // movimentacao
     bool leftPressed;
     bool rightPressed;
@@ -60,12 +60,16 @@ private:
     bool isLooping;
 
     // status para saber qual animacao tocar
-    enum State {Idle, Running, Jumping };
+    enum State
+    {
+        Idle,
+        Running,
+        Jumping
+    };
     State currentState;
 
     // trocar de sprite
-    void setAnimation (State newState);
-    QRectF hitbox() const;
+    void setAnimation(State newState);
     void acompanharPlataformaMovel();
     void atualizarVelocidadeHorizontal();
     void moverHorizontalmente();
@@ -76,8 +80,6 @@ private:
 
     // guardar direcao do knight
     bool facingRight;
-
 };
-
 
 #endif // PLAYER_H

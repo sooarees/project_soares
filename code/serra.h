@@ -2,8 +2,12 @@
 #define SERRA_H
 
 #include "armadilha.h"
-#include <QPainterPath>
 #include <QPixmap>
+
+class QPainter;
+class QPainterPath;
+class QStyleOptionGraphicsItem;
+class QWidget;
 
 class Serra : public Armadilha
 {
@@ -15,11 +19,10 @@ protected:
     void paint(
         QPainter *painter,
         const QStyleOptionGraphicsItem *option,
-        QWidget *widget
-        ) override;
+        QWidget *widget) override;
 
 private:
     QPixmap sprite;
 };
 
-#endif
+#endif // SERRA_H

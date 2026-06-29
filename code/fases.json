@@ -1,124 +1,364 @@
 {
     "fases": {
         "1": {
-            "spawn": { "x": 120, "y": 750 },
+            "spawn": {
+                "x": 370,
+                "y": 840
+            },
             "plataformas": [
-                { "x": 0, "y": 950, "width": 1920, "height": 130 }
+                {
+                    "x": 0,
+                    "y": 950,
+                    "width": 1920,
+                    "height": 130
+                }
             ],
             "plataformas_moveis": [],
             "portais": [
-                { "x": 1760, "y": 850, "destino": 2 }
+                {
+                    "x": 1540,
+                    "y": 840,
+                    "destino": 2
+                }
             ],
             "armadilhas": []
         },
         "2": {
-            "spawn": { "x": 1760, "y": 750 },
+            "spawn": {
+                "x": 1540,
+                "y": 840
+            },
             "plataformas": [
-                { "x": 1180, "y": 950, "width": 740, "height": 130 },
-                { "x": 920, "y": 850, "width": 260, "height": 36 },
-                { "x": 590, "y": 790, "width": 260, "height": 36 },
-                { "x": 0, "y": 950, "width": 420, "height": 130 }
+                {
+                    "x": 1180,
+                    "y": 950,
+                    "width": 740,
+                    "height": 130
+                },
+                {
+                    "x": 920,
+                    "y": 850,
+                    "width": 100,
+                    "height": 36
+                },
+                {
+                    "x": 590,
+                    "y": 790,
+                    "width": 100,
+                    "height": 36
+                },
+                {
+                    "x": 0,
+                    "y": 950,
+                    "width": 420,
+                    "height": 130
+                }
             ],
             "plataformas_moveis": [],
             "portais": [
-                { "x": 120, "y": 850, "destino": 3 }
+                {
+                    "x": 120,
+                    "y": 850,
+                    "destino": 3
+                }
             ],
-            "princesa": { "x": 1500, "y": 900 },
             "armadilhas": []
         },
         "3": {
-            "spawn": { "x": 120, "y": 750 },
+            "spawn": {
+                "x": 120,
+                "y": 850
+            },
             "plataformas": [
-                { "x": 0, "y": 950, "width": 420, "height": 130 },
-                { "x": 520, "y": 820, "width": 240, "height": 36 },
-                { "x": 900, "y": 680, "width": 240, "height": 36 },
-                { "x": 1280, "y": 540, "width": 360, "height": 36 }
+                {
+                    "x": 0,
+                    "y": 950,
+                    "width": 420,
+                    "height": 130
+                },
+                {
+                    "x": 520,
+                    "y": 820,
+                    "width": 120,
+                    "height": 36
+                },
+                {
+                    "x": 800,
+                    "y": 680,
+                    "width": 280,
+                    "height": 36
+                },
+                {
+                    "x": 1280,
+                    "y": 540,
+                    "width": 360,
+                    "height": 36
+                }
             ],
             "plataformas_moveis": [],
             "portais": [
-                { "x": 1460, "y": 440, "destino": 4 }
+                {
+                    "x": 1460,
+                    "y": 440,
+                    "destino": 4
+                }
             ],
             "armadilhas": []
         },
         "4": {
-            "spawn": { "x": 1460, "y": 340 },
+            "spawn": {
+                "x": 1460,
+                "y": 440
+            },
             "plataformas": [
-                { "x": 1280, "y": 540, "width": 360, "height": 36 },
-                { "x": 960, "y": 720, "width": 220, "height": 36 },
-                { "x": 90, "y": 930, "width": 360, "height": 130 }
+                {
+                    "x": 1430,
+                    "y": 540,
+                    "width": 130,
+                    "height": 60
+                },
+                {
+                    "x": 90,
+                    "y": 930,
+                    "width": 200,
+                    "height": 130
+                }
             ],
             "plataformas_moveis": [
-                { "x": 1140, "y": 610, "width": 180, "height": 32, "fimX": 760, "fimY": 760, "velocidade": 2 },
-                { "x": 600, "y": 820, "width": 180, "height": 32, "fimX": 600, "fimY": 620, "velocidade": 2 }
+                {
+                    "x": 1210,
+                    "y": 590,
+                    "width": 180,
+                    "height": 32,
+                    "fimX": 830,
+                    "fimY": 740,
+                    "velocidade": 2
+                },
+                {
+                    "x": 550,
+                    "y": 760,
+                    "width": 180,
+                    "height": 32,
+                    "fimX": 550,
+                    "fimY": 560,
+                    "velocidade": 2
+                }
             ],
             "portais": [
-                { "x": 180, "y": 830, "destino": 5 }
+                {
+                    "x": 150,
+                    "y": 830,
+                    "destino": 5
+                }
             ],
             "armadilhas": []
         },
         "5": {
-            "spawn": { "x": 180, "y": 730 },
+            "spawn": {
+                "x": 150,
+                "y": 830
+            },
             "plataformas": [
-                { "x": 90, "y": 930, "width": 360, "height": 130 },
-                { "x": 570, "y": 800, "width": 260, "height": 36 },
-                { "x": 900, "y": 650, "width": 260, "height": 36 },
-                { "x": 1230, "y": 790, "width": 280, "height": 36 },
-                { "x": 1600, "y": 610, "width": 260, "height": 36 }
+                {
+                    "x": 90,
+                    "y": 930,
+                    "width": 360,
+                    "height": 130
+                },
+                {
+                    "x": 570,
+                    "y": 800,
+                    "width": 260,
+                    "height": 36
+                },
+                {
+                    "x": 900,
+                    "y": 650,
+                    "width": 260,
+                    "height": 36
+                },
+                {
+                    "x": 1250,
+                    "y": 790,
+                    "width": 280,
+                    "height": 36
+                },
+                {
+                    "x": 1600,
+                    "y": 610,
+                    "width": 260,
+                    "height": 36
+                }
             ],
             "plataformas_moveis": [],
             "portais": [
-                { "x": 1710, "y": 510, "destino": 6 }
+                {
+                    "x": 1690,
+                    "y": 510,
+                    "destino": 6
+                }
             ],
             "armadilhas": [
-                { "tipo": "espinho", "x": 610, "y": 760 },
-                { "tipo": "espinho", "x": 670, "y": 760 },
-                { "tipo": "espinho", "x": 730, "y": 760 },
-                { "tipo": "espinho", "x": 1270, "y": 750 },
-                { "tipo": "espinho", "x": 1330, "y": 750 }
+                {
+                    "tipo": "espinho",
+                    "x": 310,
+                    "y": 890
+                },
+                {
+                    "tipo": "espinho",
+                    "x": 640,
+                    "y": 760
+                },
+                {
+                    "tipo": "espinho",
+                    "x": 700,
+                    "y": 760
+                },
+                {
+                    "tipo": "espinho",
+                    "x": 1380,
+                    "y": 750
+                },
+                {
+                    "tipo": "espinho",
+                    "x": 1320,
+                    "y": 750
+                }
             ]
         },
         "6": {
-            "spawn": { "x": 1710, "y": 410 },
+            "spawn": {
+                "x": 1690,
+                "y": 510
+            },
             "plataformas": [
-                { "x": 1600, "y": 610, "width": 260, "height": 36 },
-                { "x": 1300, "y": 760, "width": 220, "height": 36 },
-                { "x": 970, "y": 900, "width": 260, "height": 36 },
-                { "x": 550, "y": 760, "width": 260, "height": 36 },
-                { "x": 160, "y": 900, "width": 300, "height": 36 }
+                {
+                    "x": 550,
+                    "y": 760,
+                    "width": 260,
+                    "height": 36
+                },
+                {
+                    "x": 160,
+                    "y": 900,
+                    "width": 200,
+                    "height": 36
+                },
+                {
+                    "x": 1630,
+                    "y": 610,
+                    "width": 180,
+                    "height": 36
+                }
             ],
             "plataformas_moveis": [
-                { "x": 1360, "y": 670, "width": 170, "height": 32, "fimX": 1030, "fimY": 830, "velocidade": 2 },
-                { "x": 860, "y": 820, "width": 170, "height": 32, "fimX": 860, "fimY": 570, "velocidade": 2 }
+                {
+                    "x": 1420,
+                    "y": 670,
+                    "width": 170,
+                    "height": 32,
+                    "fimX": 1090,
+                    "fimY": 830,
+                    "velocidade": 2
+                },
+                {
+                    "x": 860,
+                    "y": 570,
+                    "width": 170,
+                    "height": 32,
+                    "fimX": 860,
+                    "fimY": 800,
+                    "velocidade": 2
+                }
             ],
             "portais": [
-                { "x": 260, "y": 800, "destino": 7 }
+                {
+                    "x": 220,
+                    "y": 800,
+                    "destino": 7
+                }
             ],
             "armadilhas": [
-                { "tipo": "espinho", "x": 590, "y": 720 },
-                { "tipo": "espinho", "x": 650, "y": 720 },
-                { "tipo": "serra", "x": 1080, "y": 850 }
+                {
+                    "tipo": "espinho",
+                    "x": 680,
+                    "y": 720
+                },
+                {
+                    "tipo": "espinho",
+                    "x": 750,
+                    "y": 720
+                },
+                {
+                    "tipo": "serra",
+                    "x": 410,
+                    "y": 800
+                }
             ]
         },
         "7": {
-            "spawn": { "x": 260, "y": 700 },
+            "spawn": {
+                "x": 220,
+                "y": 800
+            },
             "plataformas": [
-                { "x": 160, "y": 900, "width": 300, "height": 36 },
-                { "x": 560, "y": 760, "width": 240, "height": 36 },
-                { "x": 900, "y": 610, "width": 240, "height": 36 },
-                { "x": 1220, "y": 760, "width": 260, "height": 36 },
-                { "x": 1560, "y": 950, "width": 360, "height": 130 }
+                {
+                    "x": 160,
+                    "y": 900,
+                    "width": 240,
+                    "height": 36
+                },
+                {
+                    "x": 560,
+                    "y": 760,
+                    "width": 240,
+                    "height": 36
+                },
+                {
+                    "x": 900,
+                    "y": 610,
+                    "width": 240,
+                    "height": 36
+                },
+                {
+                    "x": 1640,
+                    "y": 280,
+                    "width": 360,
+                    "height": 130
+                }
             ],
             "plataformas_moveis": [
-                { "x": 1500, "y": 760, "width": 170, "height": 32, "fimX": 1500, "fimY": 850, "velocidade": 2 }
+                {
+                    "x": 1190,
+                    "y": 760,
+                    "width": 170,
+                    "height": 32,
+                    "fimX": 1400,
+                    "fimY": 400,
+                    "velocidade": 2
+                }
             ],
             "portais": [],
-            "princesa": { "x": 1700, "y": 900 },
+            "princesa": {
+                "x": 1760,
+                "y": 230
+            },
             "armadilhas": [
-                { "tipo": "espinho", "x": 600, "y": 720 },
-                { "tipo": "espinho", "x": 660, "y": 720 },
-                { "tipo": "espinho", "x": 1260, "y": 720 },
-                { "tipo": "espinho", "x": 1320, "y": 720 },
-                { "tipo": "serra", "x": 980, "y": 560 }
+                {
+                    "tipo": "espinho",
+                    "x": 630,
+                    "y": 720
+                },
+                {
+                    "tipo": "serra",
+                    "x": 830,
+                    "y": 680
+                },
+                {
+                    "tipo": "serra",
+                    "x": 1080,
+                    "y": 350
+                }
             ]
         }
     }

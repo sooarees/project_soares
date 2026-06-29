@@ -9,19 +9,17 @@ PlataformaMovel::PlataformaMovel(
     qreal height,
     qreal fimX,
     qreal fimY,
-    qreal velocidade
-    )
-    : Plataforma(x,y,width,height),
-    inicio(x,y),
-    fim(fimX,fimY),
-    destinoAtual(fim),
-    deslocamentoUltimo(0,0),
-    velocidade(velocidade),
-    timer(new QTimer(this))
+    qreal velocidade)
+    : Plataforma(x, y, width, height),
+      inicio(x, y),
+      fim(fimX, fimY),
+      destinoAtual(fim),
+      deslocamentoUltimo(0, 0),
+      velocidade(velocidade),
+      timer(new QTimer(this))
 {
-    connect(timer, &QTimer::timeout, this, [this]() {
-        atualizarMovimento();
-    });
+    connect(timer, &QTimer::timeout, this, [this]()
+            { atualizarMovimento(); });
 
     timer->start(16);
 }
@@ -36,7 +34,7 @@ void PlataformaMovel::atualizarMovimento()
     QPointF posicaoAtual = pos();
     QLineF caminho(posicaoAtual, destinoAtual);
 
-    if(caminho.length() <= velocidade)
+    if (caminho.length() <= velocidade)
     {
         setPos(destinoAtual);
         deslocamentoUltimo = destinoAtual - posicaoAtual;
@@ -49,8 +47,7 @@ void PlataformaMovel::atualizarMovimento()
 
     QPointF novaPosicao(
         x() + dx * velocidade,
-        y() + dy * velocidade
-        );
+        y() + dy * velocidade);
 
     setPos(novaPosicao);
     deslocamentoUltimo = novaPosicao - posicaoAtual;

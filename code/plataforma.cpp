@@ -17,24 +17,27 @@ QPixmap textura(const QString &caminho)
         tamanhoTextura,
         tamanhoTextura,
         Qt::IgnoreAspectRatio,
-        Qt::FastTransformation
-        );
+        Qt::FastTransformation);
 }
 
 void desenharTextura(QPainter *painter, const QRectF &area, const QPixmap &textura)
 {
-    for(qreal y = area.top(); y < area.bottom(); y += tamanhoTextura)
+    for (qreal y = area.top(); y < area.bottom(); y += tamanhoTextura)
     {
-        for(qreal x = area.left(); x < area.right(); x += tamanhoTextura)
+        for (qreal x = area.left(); x < area.right(); x += tamanhoTextura)
         {
             QRectF destino(x, y, tamanhoTextura, tamanhoTextura);
-            painter->drawPixmap(destino, textura, QRectF(0,0,textura.width(),textura.height()));
+            painter->drawPixmap(
+                destino,
+                textura,
+                QRectF(0, 0, textura.width(), textura.height()));
         }
     }
 }
-}
+} // namespace
 
-Plataforma::Plataforma(qreal x, qreal y, qreal width, qreal height) : ElementoFase(x, y, width, height)
+Plataforma::Plataforma(qreal x, qreal y, qreal width, qreal height)
+    : ElementoFase(x, y, width, height)
 {
     setPen(Qt::NoPen);
 }
@@ -66,13 +69,13 @@ void Plataforma::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     desenharTextura(painter, meio, platMid); // miolo da plataforma
 
-    if(esquerda.height() > 0)
+    if (esquerda.height() > 0)
     {
         desenharTextura(painter, esquerda, platEsq); // borda esquerda
-        desenharTextura(painter, direita, platDir); // borda direita
+        desenharTextura(painter, direita, platDir);  // borda direita
     }
 
-    desenharTextura(painter, topo, platUp); // borda de cima, incluindo os cantos
+    desenharTextura(painter, topo, platUp);    // borda de cima, incluindo os cantos
     desenharTextura(painter, baixo, platDown); // borda de baixo, incluindo os cantos
 
     painter->restore();

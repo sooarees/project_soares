@@ -4,6 +4,10 @@
 #include "armadilha.h"
 #include <QPixmap>
 
+class QPainter;
+class QStyleOptionGraphicsItem;
+class QWidget;
+
 class Espinho : public Armadilha
 {
 public:
@@ -13,11 +17,10 @@ protected:
     void paint(
         QPainter *painter,
         const QStyleOptionGraphicsItem *option,
-        QWidget *widget
-        ) override;
+        QWidget *widget) override;
 
 private:
     QPixmap sprite;
 };
 
-#endif
+#endif // ESPINHO_H

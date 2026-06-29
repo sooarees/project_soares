@@ -2,7 +2,9 @@
 #include <QDateTime>
 #include <QPainter>
 
-Portal::Portal(qreal x, qreal y, int destino): ElementoFase(x, y, 50, 100),faseDestino(destino)
+Portal::Portal(qreal x, qreal y, int destino)
+    : ElementoFase(x, y, 50, 100),
+      faseDestino(destino)
 {
     sprite.load(":/Sprites/Game Images/Royal/Portal/Dimensional_Portal.png");
 }
@@ -28,8 +30,7 @@ void Portal::paint(
     const int linha = frame % 2;
 
     painter->drawPixmap(
-        QRectF(0,0,77,100),
+        QRectF(0, 0, 77, 100),
         sprite,
-        QRectF(coluna * frameWidth, linha * frameHeight, frameWidth, frameHeight)
-        );
+        QRectF(coluna * frameWidth, linha * frameHeight, frameWidth, frameHeight));
 }

@@ -1,7 +1,7 @@
 #include "hud.h"
 
-#include <QPainter>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QPixmap>
 
 HUD::HUD(QWidget *parent)
@@ -36,7 +36,7 @@ void HUD::paintEvent(QPaintEvent *event)
 
     painter.drawPixmap(rect(), background, background.rect());
 
-    if(vidas <= 0)
+    if (vidas <= 0)
     {
         return;
     }
@@ -47,14 +47,13 @@ void HUD::paintEvent(QPaintEvent *event)
     const int inicioX = (width() - larguraTotalVidas) / 2;
     const int y = (height() - tamanhoVida) / 2;
 
-    for(int i = 0; i < vidas; i++)
+    for (int i = 0; i < vidas; i++)
     {
         int x = inicioX + i * (tamanhoVida + espaco);
 
         painter.drawPixmap(
             QRect(x, y, tamanhoVida, tamanhoVida),
             vida,
-            vida.rect()
-            );
+            vida.rect());
     }
 }

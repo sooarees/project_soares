@@ -2,9 +2,9 @@
 #define HUD_H
 
 #include <QLabel>
-#include <QWidget>
 
 class QPaintEvent;
+class QWidget;
 
 class HUD : public QLabel
 {
@@ -22,4 +22,4 @@ private:
     void atualizar();
 };
 
-#endif
+#endif // HUD_H

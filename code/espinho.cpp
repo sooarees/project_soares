@@ -2,9 +2,9 @@
 #include <QPainter>
 
 Espinho::Espinho(qreal x, qreal y)
-    : Armadilha(x,y,60,40)
+    : Armadilha(x, y, 60, 40)
 {
-    setRect(0,3,60,37);
+    definirHitbox(QRectF(0, 3, 60, 37));
     sprite.load(":/Sprites/Game Images/Royal/Armadilhas/espinho.png");
 }
 
@@ -16,11 +16,8 @@ void Espinho::paint(
     Q_UNUSED(option);
     Q_UNUSED(widget);
 
-
     painter->drawPixmap(
-        QRectF(0,0,60,40),
+        QRectF(0, 0, 60, 40),
         sprite,
-        sprite.rect()
-        );
-
+        sprite.rect());
 }
