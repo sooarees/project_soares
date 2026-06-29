@@ -47,19 +47,19 @@ Ao morrer, o jogador retorna ao início da fase e pode tentar novamente até com
 
 ### Casos de Uso
 
-- Iniciar jogo
+- **Iniciar jogo**  
     Ao iniciar o jogo, o sistema carrega a fase inicial, posiciona o personagem no ponto inicial e começa a contar o cronômetro.
-- Controlar personagem
+- **Controlar personagem**  
     Movimentações do personagem, mover para os lados e pular.
-- Reiniciar fase
+- **Reiniciar fase**  
     Caso o Jogador caia em algum buraco ou encoste em algum espinho o personagem volta ao ponto inicial da fase mas mantém o cronômetro rodando. 
-- Concluir fase
+- **Concluir fase**  
     Mostra o tempo levado, concluir fase é acionado quando o Jogador alcança a meta da fase
-    - Salvar Melhor Tempo
+    - **Salvar Melhor Tempo**  
         Caso o tempo alcançado nesse jogo for inferior ao seu melhor tempo ele salva e guarda como novo melhor tempo.
-- Visualizar melhor tempo
+- **Visualizar melhor tempo**  
     O Jogador consegue visualizar o melhor tempo dele.
-- Reiniciar Jogo (implementar)
+- **Reiniciar Jogo (implementar)**  
     Reiniciar as fases e o cronômetro para nova tentativa.
 
 
@@ -71,7 +71,7 @@ Ao morrer, o jogador retorna ao início da fase e pode tentar novamente até com
 
 
 
-## Diagrama de Classes
+## Diagrama de Classes (Primeira análise e ideia)
 
 ## Descrição das Classes
 
