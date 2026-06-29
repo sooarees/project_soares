@@ -7,14 +7,17 @@
 #include <QBrush>
 #include <QFontDatabase>
 #include <QLabel>
+#include <QMediaPlayer>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPen>
 #include <QPixmap>
 #include <QPushButton>
+#include <QAudioOutput>
 #include <QMessageBox>
 #include <QSettings>
 #include <QStringList>
+#include <QUrl>
 #include <QVBoxLayout>
 
 namespace
@@ -25,6 +28,8 @@ const int vidasMaximas = 5;
 const int limiteQueda = 1030;
 const int frameMs = 16;
 const int cronometroFrameMs = 30;
+const qreal volumeSoundtrack = 0.2;
+const char *caminhoSoundtrack = "qrc:/Audio/SwitchWithMeTheme.wav";
 
 class CronometroLabel : public QLabel
 {
@@ -66,6 +71,7 @@ Game::Game(QWidget *parent): QWidget(parent)
     configurarHud();
     configurarBotaoFechar();
     configurarCronometro();
+    configurarSoundtrack();
     iniciarGameLoop();
     reposicionarInterface();
 }
@@ -181,6 +187,18 @@ void Game::configurarCronometro()
     connect(cronometroTimer, &QTimer::timeout, this, &Game::atualizarCronometro);
     cronometroTimer->start(cronometroFrameMs);
     atualizarCronometro();
+}
+
+void Game::configurarSoundtrack()
+{
+    saidaAudio = new QAudioOutput(this);
+    saidaAudio->setVolume(volumeSoundtrack);
+
+    soundtrack = new QMediaPlayer(this);
+    soundtrack->setAudioOutput(saidaAudio);
+    soundtrack->setSource(QUrl(caminhoSoundtrack));
+    soundtrack->setLoops(QMediaPlayer::Infinite);
+    soundtrack->play();
 }
 
 void Game::iniciarGameLoop()
@@ -369,4 +387,3 @@ void Game::atualizarCronometro()
 
     labelCronometro->setText(formatarTempo(cronometro.elapsed()));
 }
-

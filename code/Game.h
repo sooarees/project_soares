@@ -10,6 +10,8 @@
 
 class QLabel;
 class QPushButton;
+class QAudioOutput;
+class QMediaPlayer;
 class Fase;
 class Portal;
 class Armadilha;
@@ -37,6 +39,8 @@ private:
     QTimer *cronometroTimer = nullptr;
     QElapsedTimer cronometro;
     QLabel *labelCronometro = nullptr;
+    QMediaPlayer *soundtrack = nullptr;
+    QAudioOutput *saidaAudio = nullptr;
 
     // fase
     Fase *fase = nullptr;
@@ -48,6 +52,7 @@ private:
     void configurarHud();
     void configurarBotaoFechar();
     void configurarCronometro();
+    void configurarSoundtrack();
     void iniciarGameLoop();
     void reposicionarInterface();
     void carregarFase(int numeroFase);

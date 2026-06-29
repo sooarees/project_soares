@@ -33,4 +33,7 @@
     <qresource prefix="/Fases">
         <file>fases.json</file>
     </qresource>
+    <qresource prefix="/Audio">
+        <file alias="SwitchWithMeTheme.wav">Game Images/Royal/Soundtrack/SwitchWithMeTheme.wav</file>
+    </qresource>
 </RCC>
