@@ -10,7 +10,11 @@
 
 namespace
 {
-const int coyoteFramesMax = 8;
+const qreal gravidade = 0.6;
+const qreal veloHorizontal = 6;
+const qreal forcaPulo = -15;
+const qreal forcaQuedaRapida = 0.85;
+const int coyoteFrames = 8;
 const qreal fatorPlataformaMovelAndando = 0.0;
 }
 
@@ -25,7 +29,7 @@ Player::Player(qreal x, qreal y): ElementoFase(x,y,51,96)
     veloY = 0;
 
     onGround = false;
-    coyoteFrames = 0;
+    coyoteFramesRestantes = 0;
     plataformaMovelAtual = nullptr;
     facingRight = true; // comeca olhando pra direita
 
@@ -113,8 +117,6 @@ void Player::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     qreal visualWidth = 240;
     qreal visualHeight = 210;
 
-    // ajuste de offset horizontal
-    qreal ajustemeio = 35;
     qreal offsetX = (rect().width() - visualWidth) / 2;
     // ajuste de offset vertical
     qreal ajusteDeChao = 55;
@@ -173,23 +175,17 @@ void Player::keyPressEvent(QKeyEvent *event)
         rightPressed = true;
     }
     // jump
-    if(event->key() == Qt::Key_Space && coyoteFrames > 0)
+    if(event->key() == Qt::Key_Space && coyoteFramesRestantes > 0)
     {
-        veloY = -15;
+        veloY = forcaPulo;
         onGround = false;
-        coyoteFrames = 0;
+        coyoteFramesRestantes = 0;
     }
     // fast Fall
     if(event->key() == Qt::Key_S && !onGround)
     {
         downPressed = true;
     }
-/* DOUBLE JUMP - PRECISA POR UMA VARIAVEL QUE VERIFICA E SÓ DEIXA 1 DOUBLE JUMP
-    if(event->key() == Qt::Key_Space && !onGround)
-    {
-        veloY = -18;
-    }
-*/
 }
 
 void Player::keyReleaseEvent(QKeyEvent *event)
@@ -206,9 +202,6 @@ void Player::keyReleaseEvent(QKeyEvent *event)
 
 void Player::updateMovement()
 {
-    const qreal gravity = 0.6;
-    const qreal speed   = 6;
-
     if(onGround && plataformaMovelAtual)
     {
         QPointF deslocamento = plataformaMovelAtual->deslocamentoUltimoFrame();
@@ -226,12 +219,12 @@ void Player::updateMovement()
     veloX = 0;
     if(leftPressed)
     {
-        veloX = -speed;
+        veloX = -veloHorizontal;
         facingRight = false;
     }
     if(rightPressed)
     {
-        veloX = speed;
+        veloX = veloHorizontal;
         facingRight = true;
     }
 
@@ -261,10 +254,10 @@ void Player::updateMovement()
 
     // fast-fall
     if(downPressed && !onGround)
-        veloY += 0.85;
+        veloY += forcaQuedaRapida;
 
     // gravidade
-    veloY += gravity;
+    veloY += gravidade;
 
     // salva bordas antes de mover em Y
     qreal prevBottom = y() + hitbox().bottom();
@@ -290,7 +283,7 @@ void Player::updateMovement()
             setY(platTop - hitbox().bottom());
             veloY = 0;
             onGround = true;
-            coyoteFrames = coyoteFramesMax;
+            coyoteFramesRestantes = coyoteFrames;
             plataformaMovelAtual = dynamic_cast<PlataformaMovel*>(plat);
         }
         // Player estava abaixo, bate no teto
@@ -299,18 +292,18 @@ void Player::updateMovement()
             setY(platBottom - hitbox().top());
             veloY = 0;
             onGround = false;
-            coyoteFrames = 0;
+            coyoteFramesRestantes = 0;
         }
     }
 
-    if(!onGround && estavaNoChao && coyoteFrames <= 0)
+    if(!onGround && estavaNoChao && coyoteFramesRestantes <= 0)
     {
-        coyoteFrames = coyoteFramesMax;
+        coyoteFramesRestantes = coyoteFrames;
     }
 
-    if(!onGround && coyoteFrames > 0)
+    if(!onGround && coyoteFramesRestantes > 0)
     {
-        coyoteFrames--;
+        coyoteFramesRestantes--;
     }
 
     // Sair da cena

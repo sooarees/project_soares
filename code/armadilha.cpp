@@ -1,12 +1,10 @@
 #include "armadilha.h"
-#include <QBrush>
 
 Armadilha::Armadilha(qreal x, qreal y, qreal width, qreal height): ElementoFase(x,y,width,height)
 {
-    setBrush(Qt::red);
 }
 
-int Armadilha::dano() const
+bool Armadilha::causaDano() const
 {
-    return 1;
+    return true;
 }

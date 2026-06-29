@@ -49,7 +49,7 @@ private:
     void perderVida();
     void ganharVida();
     void ganharJogo();
-    QString formatarTempo(qint64 milissegundos) const;
+    void reiniciarJogo();
     HUD *hud = nullptr;
     QPushButton *botaoFechar = nullptr;
     int vidas;

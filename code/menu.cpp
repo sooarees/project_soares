@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "Game.h"
+#include "tempo.h"
 
 #include <QPushButton>
 #include <QLabel>
@@ -28,6 +29,7 @@
 
 namespace
 {
+// Componentes visuais usados apenas pelo menu.
 class TituloLabel : public QLabel
 {
 public:
@@ -77,6 +79,7 @@ protected:
     }
 };
 
+// Botao baseado em sprites, com area clicavel seguindo pixels visiveis.
 class BotaoImagem : public QPushButton
 {
 public:
@@ -176,6 +179,7 @@ private:
     int tamanhoDoIcone;
 };
 
+// Label customizada para desenhar o melhor tempo com contorno.
 class MelhorTempoLabel : public QLabel
 {
 public:
@@ -232,20 +236,9 @@ protected:
     }
 };
 
-QString formatarTempo(qint64 milissegundos)
-{
-    qint64 minutos = milissegundos / 60000;
-    qint64 segundos = (milissegundos % 60000) / 1000;
-    qint64 milesimos = milissegundos % 1000;
-
-    return QString("%1:%2:%3")
-        .arg(minutos, 2, 10, QChar('0'))
-        .arg(segundos, 2, 10, QChar('0'))
-        .arg(milesimos, 3, 10, QChar('0'));
-}
 }
 
-
+// Implementacao do Menu.
 Menu::Menu()
 {
     configurarInterface();
@@ -265,20 +258,18 @@ void Menu::paintEvent(QPaintEvent *event)
         );
 }
 
-
 void Menu::configurarInterface()
 {
-
     setFixedSize(800,600);
     setWindowFlags(Qt::FramelessWindowHint);
 
     move(QGuiApplication::primaryScreen()->geometry().center() - rect().center());
 
+    // Titulo
     titulo = new TituloLabel("ROYAL KNIGHT");
 
     titulo->setAlignment(Qt::AlignCenter);
     titulo->setMinimumHeight(80);
-
 
     int idFonteTitulo = QFontDatabase::addApplicationFont(":/Sprites/Game Images/Royal/Menu/GravityBold8.ttf");
     QString familiaTitulo = "Georgia";
@@ -299,8 +290,7 @@ void Menu::configurarInterface()
 
     titulo->setFont(fonteTitulo);
 
-
-
+    // Melhor tempo
     QSettings configuracoes("Royal Knight", "Royal Knight");
     qint64 melhorTempoMs = configuracoes.value("melhorTempoMs", -1).toLongLong();
 
@@ -313,14 +303,13 @@ void Menu::configurarInterface()
     melhorTempo->setAlignment(Qt::AlignCenter);
     melhorTempo->setMinimumHeight(100);
 
-
     QFont fonteTempo(familiaTitulo);
     fonteTempo.setPointSize(17);
     fonteTempo.setBold(true);
 
     melhorTempo->setFont(fonteTempo);
 
-
+    // Botoes
     botaoJogar = new BotaoImagem(
         ":/Sprites/Game Images/Royal/Menu/botao/Button_2_normal.png",
         ":/Sprites/Game Images/Royal/Menu/botao/Button_02_hovered.png",
@@ -337,12 +326,8 @@ void Menu::configurarInterface()
         160
         );
 
-
-
     botaoJogar->setFixedSize(192,192);
     botaoSair->setFixedSize(192,230);
-
-
 
     QFont fonteBotao;
     fonteBotao.setPointSize(20);
@@ -350,8 +335,7 @@ void Menu::configurarInterface()
     botaoJogar->setFont(fonteBotao);
     botaoSair->setFont(fonteBotao);
 
-
-
+    // Layout
     QVBoxLayout *layout = new QVBoxLayout();
     QHBoxLayout *layoutBotoes = new QHBoxLayout();
 
@@ -359,43 +343,28 @@ void Menu::configurarInterface()
     layoutBotoes->addSpacing(35);
     layoutBotoes->addWidget(botaoJogar);
 
-
     layout->addStretch();
-
     layout->addWidget(titulo);
-
     layout->addSpacing(50);
-
     layout->addLayout(layoutBotoes);
     layout->setAlignment(layoutBotoes, Qt::AlignCenter);
-
-
     layout->addSpacing(40);
-
     layout->addWidget(melhorTempo);
-
     layout->addStretch();
-
-
 
     setLayout(layout);
 
-
-
+    // Eventos
     connect(botaoJogar,
             &QPushButton::clicked,
             this,
             &Menu::iniciarJogo);
 
-
     connect(botaoSair,
             &QPushButton::clicked,
             this,
             &QWidget::close);
-
 }
-
-
 
 void Menu::iniciarJogo()
 {

@@ -41,11 +41,10 @@ private:
     qreal veloY;
 
     bool onGround;
-    int coyoteFrames;
+    int coyoteFramesRestantes;
     PlataformaMovel *plataformaMovelAtual;
 
     // timers
-    QTimer *timer;
     QTimer *animTimer;
 
     // graficos

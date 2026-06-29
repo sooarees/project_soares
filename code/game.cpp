@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "tempo.h"
 #include <QBrush>
 #include <QFile>
 #include <QFontDatabase>
@@ -24,6 +25,15 @@ qreal valor(const QJsonObject &objeto, const QString &chave, qreal padrao = 0)
 {
     return objeto.value(chave).toDouble(padrao); // devolve o valor da chave e transforma em double
 }
+
+const int larguraCena = 1920;
+const int alturaCena = 1080;
+const int spawnInicialX = 120;
+const int spawnInicialY = 750;
+const int vidasMaximas = 5;
+const int limiteQueda = 1030;
+const int frameMs = 16;
+const int cronometroFrameMs = 30;
 
 class CronometroLabel : public QLabel
 {
@@ -56,13 +66,13 @@ Game::Game(QWidget *parent): QWidget(parent)
 {
     // Cena
     scene = new QGraphicsScene();
-    scene->setSceneRect(0,0,1920,1080);
+    scene->setSceneRect(0,0,larguraCena,alturaCena);
 
     QPixmap background(":/Sprites/Game Images/Royal/Castle/background.png");
     scene->setBackgroundBrush(QBrush(background)); // repete a imagem para preencher a cena
 
     // Jogador
-    knight = new Player(120,750);
+    knight = new Player(spawnInicialX,spawnInicialY);
 
     knight->setFlag(QGraphicsItem::ItemIsFocusable);
     knight->setFocus();
@@ -104,7 +114,7 @@ Game::Game(QWidget *parent): QWidget(parent)
         );
 
     // vidas
-    vidas = 5;
+    vidas = vidasMaximas;
 
     // hud
     hud = new HUD(this);
@@ -163,7 +173,7 @@ Game::Game(QWidget *parent): QWidget(parent)
     cronometro.start();
     cronometroTimer = new QTimer(this);
     connect(cronometroTimer, &QTimer::timeout, this, &Game::atualizarCronometro);
-    cronometroTimer->start(30);
+    cronometroTimer->start(cronometroFrameMs);
     atualizarCronometro();
 
     // gameTimer
@@ -171,7 +181,7 @@ Game::Game(QWidget *parent): QWidget(parent)
 
     connect(gameTimer, &QTimer::timeout, this, &Game::update);
 
-    gameTimer->start(16); // 16ms aproximadamente 60fps, 60fps = 1000ms/16ms
+    gameTimer->start(frameMs); // aproximadamente 60 FPS
 }
 
 void Game::update()
@@ -206,7 +216,7 @@ void Game::update()
         // armadilha
         Armadilha *armadilha = dynamic_cast<Armadilha*>(item);
 
-        if(armadilha)
+        if(armadilha && armadilha->causaDano())
         {
             perderVida();
             break;
@@ -214,7 +224,7 @@ void Game::update()
     }
 
     // "buraco"
-    if(knight->y() > 1030)
+    if(knight->y() > limiteQueda)
     {
         perderVida();
     }
@@ -229,7 +239,7 @@ void Game::carregarFase(int fase)
     QFile arquivo(":/Fases/fases.json");
     if(!arquivo.open(QIODevice::ReadOnly)) // se nao abrir, bota ele em uma posicao padrao
     {
-        knight->setPos(120,750);
+        knight->setPos(spawnInicialX,spawnInicialY);
         scene->addItem(knight);
         knight->setFocus();
         return;
@@ -311,7 +321,7 @@ void Game::carregarFase(int fase)
 
     // le o spawn e converte em objeto
     QJsonObject spawn = dadosFase.value("spawn").toObject();
-    knight->setPos(valor(spawn, "x", 120), valor(spawn, "y", 750));
+    knight->setPos(valor(spawn, "x", spawnInicialX), valor(spawn, "y", spawnInicialY));
     scene->addItem(knight);
     knight->setFocus();
 }
@@ -354,19 +364,14 @@ void Game::perderVida()
 {
     vidas--;
 
-    hud->setVidas(vidas);
-
     if(vidas <= 0)
     {
-        vidas = 5;
-        hud->setVidas(vidas);
+        reiniciarJogo();
+        return;
+    }
 
-        carregarFase(1);
-    }
-    else
-    {
-        carregarFase(faseAtual);
-    }
+    hud->setVidas(vidas);
+    carregarFase(faseAtual);
 }
 
 void Game::ganharVida()
@@ -410,6 +415,18 @@ void Game::ganharJogo()
     close();
 }
 
+void Game::reiniciarJogo()
+{
+    faseAtual = 1;
+    vidas = vidasMaximas;
+
+    hud->setVidas(vidas);
+    carregarFase(faseAtual);
+
+    cronometro.restart();
+    atualizarCronometro();
+}
+
 void Game::atualizarCronometro()
 {
     if(!labelCronometro)
@@ -418,14 +435,3 @@ void Game::atualizarCronometro()
     labelCronometro->setText(formatarTempo(cronometro.elapsed()));
 }
 
-QString Game::formatarTempo(qint64 milissegundos) const
-{
-    qint64 minutos = milissegundos / 60000;
-    qint64 segundos = (milissegundos % 60000) / 1000;
-    qint64 milesimos = milissegundos % 1000;
-
-    return QString("%1:%2:%3")
-        .arg(minutos, 2, 10, QChar('0'))
-        .arg(segundos, 2, 10, QChar('0'))
-        .arg(milesimos, 3, 10, QChar('0'));
-}

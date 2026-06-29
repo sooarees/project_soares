@@ -23,6 +23,7 @@
             "portais": [
                 { "x": 120, "y": 850, "destino": 3 }
             ],
+            "princesa": { "x": 1500, "y": 900 },
             "armadilhas": []
         },
         "3": {
@@ -111,7 +112,7 @@
                 { "x": 1500, "y": 760, "width": 170, "height": 32, "fimX": 1500, "fimY": 850, "velocidade": 2 }
             ],
             "portais": [],
-            "princesa": { "x": 1700, "y": 880 },
+            "princesa": { "x": 1700, "y": 900 },
             "armadilhas": [
                 { "tipo": "espinho", "x": 600, "y": 720 },
                 { "tipo": "espinho", "x": 660, "y": 720 },

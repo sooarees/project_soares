@@ -4,19 +4,19 @@
 
 namespace
 {
-const qreal larguraVisual = 140;
-const qreal alturaVisual = 70;
+const qreal larguraVisual = 115;
+const qreal alturaVisual = 50;
 
 QRectF hitboxPrincesa()
 {
-    return QRectF(0,0,140,60);
+    return QRectF(0,0,115,45);
 }
 }
 
 Princesa::Princesa(qreal x, qreal y)
     : ElementoFase(x,y,larguraVisual,alturaVisual)
 {
-    sprite.load(":/Sprites/Game Images/Royal/Princess/temporario.png");
+    sprite.load(":/Sprites/Game Images/Royal/Princess/deitada.png");
 }
 
 QRectF Princesa::boundingRect() const
@@ -44,12 +44,4 @@ void Princesa::paint(
         sprite,
         sprite.rect()
         );
-
-    // DEBUG temporario: azul = sprite, vermelho = hitbox de colisao
-    painter->setBrush(Qt::NoBrush);
-    painter->setPen(QPen(Qt::blue, 2));
-    painter->drawRect(boundingRect());
-
-    painter->setPen(QPen(Qt::red, 2));
-    painter->drawRect(hitboxPrincesa());
 }
