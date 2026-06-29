@@ -369,6 +369,7 @@ void Menu::configurarInterface()
 void Menu::iniciarJogo()
 {
     Game *game = new Game();
+    game->setAttribute(Qt::WA_DeleteOnClose);
 
     game->show();
 

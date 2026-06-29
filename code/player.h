@@ -66,6 +66,13 @@ private:
     // trocar de sprite
     void setAnimation (State newState);
     QRectF hitbox() const;
+    void acompanharPlataformaMovel();
+    void atualizarVelocidadeHorizontal();
+    void moverHorizontalmente();
+    void moverVerticalmente();
+    void atualizarCoyoteTime(bool estavaNoChao);
+    void limitarDentroDaCena();
+    void atualizarEstadoAnimacao();
 
     // guardar direcao do knight
     bool facingRight;

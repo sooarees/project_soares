@@ -24,7 +24,6 @@ void Portal::paint(
     const int frameHeight = 32;
     const int totalFrames = 6;
     const int frame = (QDateTime::currentMSecsSinceEpoch() / 120) % totalFrames;
-
     const int coluna = frame / 2;
     const int linha = frame % 2;
 

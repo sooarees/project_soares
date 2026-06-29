@@ -34,6 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         espinho.h espinho.cpp
         serra.h serra.cpp
         princesa.h princesa.cpp
+        fase.h fase.cpp
         tempo.h
     )
 # Define target properties for Android with Qt 6 as:

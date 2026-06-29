@@ -2,7 +2,6 @@
 #include "elementofase.h"
 #include "plataforma.h"
 #include "plataforma_movel.h"
-#include "portal.h"
 #include <QKeyEvent>
 #include <QGraphicsScene>
 #include <QPainter>
@@ -202,6 +201,17 @@ void Player::keyReleaseEvent(QKeyEvent *event)
 
 void Player::updateMovement()
 {
+    acompanharPlataformaMovel();
+    plataformaMovelAtual = nullptr;
+
+    moverHorizontalmente();
+    moverVerticalmente();
+    limitarDentroDaCena();
+    atualizarEstadoAnimacao();
+}
+
+void Player::acompanharPlataformaMovel()
+{
     if(onGround && plataformaMovelAtual)
     {
         QPointF deslocamento = plataformaMovelAtual->deslocamentoUltimoFrame();
@@ -212,11 +222,12 @@ void Player::updateMovement()
 
         setPos(pos() + deslocamento);
     }
+}
 
-    plataformaMovelAtual = nullptr;
-
-    // horizontal
+void Player::atualizarVelocidadeHorizontal()
+{
     veloX = 0;
+
     if(leftPressed)
     {
         veloX = -veloHorizontal;
@@ -227,8 +238,12 @@ void Player::updateMovement()
         veloX = veloHorizontal;
         facingRight = true;
     }
+}
 
-    // salva bordas antes de mover em X
+void Player::moverHorizontalmente()
+{
+    atualizarVelocidadeHorizontal();
+
     qreal prevRight = x() + hitbox().right();
     qreal prevLeft  = x() + hitbox().left();
 
@@ -249,17 +264,15 @@ void Player::updateMovement()
         else if(prevLeft >= platRight && veloX < 0)
             setX(platRight - hitbox().left());
     }
+}
 
-    // vertical
-
-    // fast-fall
+void Player::moverVerticalmente()
+{
     if(downPressed && !onGround)
         veloY += forcaQuedaRapida;
 
-    // gravidade
     veloY += gravidade;
 
-    // salva bordas antes de mover em Y
     qreal prevBottom = y() + hitbox().bottom();
     qreal prevTop    = y() + hitbox().top();
 
@@ -273,7 +286,6 @@ void Player::updateMovement()
         Plataforma *plat = dynamic_cast<Plataforma*>(item);
         if(!plat) continue;
 
-        //salva a posicao da plataforma
         qreal platTop    = plat->y();
         qreal platBottom = plat->y() + plat->rect().height();
 
@@ -296,6 +308,11 @@ void Player::updateMovement()
         }
     }
 
+    atualizarCoyoteTime(estavaNoChao);
+}
+
+void Player::atualizarCoyoteTime(bool estavaNoChao)
+{
     if(!onGround && estavaNoChao && coyoteFramesRestantes <= 0)
     {
         coyoteFramesRestantes = coyoteFrames;
@@ -305,8 +322,10 @@ void Player::updateMovement()
     {
         coyoteFramesRestantes--;
     }
+}
 
-    // Sair da cena
+void Player::limitarDentroDaCena()
+{
     if(scene())
     {
         QRectF limites = scene()->sceneRect();
@@ -334,8 +353,10 @@ void Player::updateMovement()
         }
 
     }
+}
 
-    // Animacoes
+void Player::atualizarEstadoAnimacao()
+{
     State nextState;
 
     if (!onGround)
@@ -358,7 +379,6 @@ void Player::updateMovement()
     if (nextState != currentState) {
         setAnimation(nextState);
     }
-
 }
 
 void Player::limparPlataformaMovel()

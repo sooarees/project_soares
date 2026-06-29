@@ -8,7 +8,7 @@ class Armadilha : public ElementoFase
 public:
 
     Armadilha(qreal x, qreal y, qreal width, qreal height);
-    bool causaDano() const;
+    virtual bool causaDano() const;
 
 };
 

@@ -10,16 +10,12 @@
 
 class QLabel;
 class QPushButton;
+class Fase;
+class Portal;
+class Armadilha;
 
 #include "player.h"
-#include "plataforma.h"
-#include "portal.h"
-#include "plataforma_movel.h"
 #include "hud.h"
-#include "armadilha.h"
-#include "espinho.h"
-#include "serra.h"
-#include "princesa.h"
 
 class Game : public QWidget
 {
@@ -27,23 +23,39 @@ class Game : public QWidget
 
 public:
     Game(QWidget *parent = nullptr);
+    ~Game() override;
 
 private slots:
-    void update();
+    void atualizarJogo();
     void atualizarCronometro();
 
 private:
-    QGraphicsScene *scene;
+    QGraphicsScene *scene = nullptr;
     QGraphicsView *view = nullptr;
-    Player *knight;
-    QTimer *gameTimer;
+    Player *knight = nullptr;
+    QTimer *gameTimer = nullptr;
     QTimer *cronometroTimer = nullptr;
     QElapsedTimer cronometro;
     QLabel *labelCronometro = nullptr;
 
     // fase
-    int faseAtual;
-    void carregarFase(int fase);
+    Fase *fase = nullptr;
+    int faseAtual = 1;
+    void configurarCena();
+    void configurarJogador();
+    void configurarFaseInicial();
+    void configurarView();
+    void configurarHud();
+    void configurarBotaoFechar();
+    void configurarCronometro();
+    void iniciarGameLoop();
+    void reposicionarInterface();
+    void carregarFase(int numeroFase);
+    void verificarColisoes();
+    void verificarQueda();
+    void colidirComPortal(Portal *portal);
+    void colidirComPrincesa();
+    void colidirComArmadilha(Armadilha *armadilha);
 
     // vidas
     void perderVida();
@@ -52,7 +64,7 @@ private:
     void reiniciarJogo();
     HUD *hud = nullptr;
     QPushButton *botaoFechar = nullptr;
-    int vidas;
+    int vidas = 0;
 protected:
     void resizeEvent(QResizeEvent *event) override;
 };

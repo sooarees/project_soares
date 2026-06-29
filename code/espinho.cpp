@@ -4,7 +4,7 @@
 Espinho::Espinho(qreal x, qreal y)
     : Armadilha(x,y,60,40)
 {
-    setRect(0,3,60,37); // desce o topo da hitbox em 3px, mantendo a base
+    setRect(0,3,60,37);
     sprite.load(":/Sprites/Game Images/Royal/Armadilhas/espinho.png");
 }
 

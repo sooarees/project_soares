@@ -1,12 +1,11 @@
 #include "Game.h"
+#include "armadilha.h"
+#include "fase.h"
+#include "portal.h"
+#include "princesa.h"
 #include "tempo.h"
 #include <QBrush>
-#include <QFile>
 #include <QFontDatabase>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonValue>
 #include <QLabel>
 #include <QPainter>
 #include <QPaintEvent>
@@ -18,18 +17,10 @@
 #include <QStringList>
 #include <QVBoxLayout>
 
-namespace // funcao valor so existe nesse arquivo
+namespace
 {
-// (PARA O ARQUIVO JSON) pega o objeto onde vai rodar o for, chave eh oq eu quero ler por exemplo x,y,widght,height e se nao achar nada devolve 0
-qreal valor(const QJsonObject &objeto, const QString &chave, qreal padrao = 0)
-{
-    return objeto.value(chave).toDouble(padrao); // devolve o valor da chave e transforma em double
-}
-
 const int larguraCena = 1920;
 const int alturaCena = 1080;
-const int spawnInicialX = 120;
-const int spawnInicialY = 750;
 const int vidasMaximas = 5;
 const int limiteQueda = 1030;
 const int frameMs = 16;
@@ -64,67 +55,82 @@ protected:
 
 Game::Game(QWidget *parent): QWidget(parent)
 {
-    // Cena
-    scene = new QGraphicsScene();
+    configurarCena();
+    configurarJogador();
+    configurarFaseInicial();
+    configurarView();
+
+    showFullScreen();
+    //showMaximized();
+
+    configurarHud();
+    configurarBotaoFechar();
+    configurarCronometro();
+    iniciarGameLoop();
+    reposicionarInterface();
+}
+
+Game::~Game()
+{
+    delete fase;
+}
+
+void Game::configurarCena()
+{
+    scene = new QGraphicsScene(this);
     scene->setSceneRect(0,0,larguraCena,alturaCena);
 
     QPixmap background(":/Sprites/Game Images/Royal/Castle/background.png");
     scene->setBackgroundBrush(QBrush(background)); // repete a imagem para preencher a cena
+}
 
-    // Jogador
-    knight = new Player(spawnInicialX,spawnInicialY);
+void Game::configurarJogador()
+{
+    knight = new Player(Fase::spawnPadraoX, Fase::spawnPadraoY);
 
     knight->setFlag(QGraphicsItem::ItemIsFocusable);
     knight->setFocus();
 
     scene->addItem(knight);
+}
 
-    // Fase
+void Game::configurarFaseInicial()
+{
+    fase = new Fase(scene, knight);
     faseAtual = 1;
     carregarFase(faseAtual);
+}
 
-    // View
+void Game::configurarView()
+{
     view = new QGraphicsView(this);
     view->setScene(scene);
+    view->setSceneRect(scene->sceneRect());
 
     view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // Ocupa todo espaco disponivel
-    view->setSizePolicy(
-        QSizePolicy::Expanding,
-        QSizePolicy::Expanding
-        );
-
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    QVBoxLayout *layout = new QVBoxLayout();
     layout->setContentsMargins(0,0,0,0);
     layout->addWidget(view);
 
     setLayout(layout);
+}
 
-    view->setSceneRect(scene->sceneRect());
-
-    showFullScreen();
-    //showMaximized();
-
-    view->fitInView(
-        scene->sceneRect(),
-        Qt::KeepAspectRatio
-        );
-
-    // vidas
+void Game::configurarHud()
+{
     vidas = vidasMaximas;
 
-    // hud
     hud = new HUD(this);
-
     hud->setGeometry(20,20,220,60);
-
     hud->show();
     hud->raise();
+}
 
-    // botao temporario para fechar o jogo
+void Game::configurarBotaoFechar()
+{
     botaoFechar = new QPushButton("X", this);
     botaoFechar->setFixedSize(28,28);
     botaoFechar->setFocusPolicy(Qt::NoFocus);
@@ -139,13 +145,14 @@ Game::Game(QWidget *parent): QWidget(parent)
         "background-color: rgba(180, 40, 40, 220);"
         "}"
         );
-    botaoFechar->move((width() - botaoFechar->width()) / 2,20);
     botaoFechar->show();
     botaoFechar->raise();
 
     connect(botaoFechar, &QPushButton::clicked, this, &Game::close);
+}
 
-    // cronometro
+void Game::configurarCronometro()
+{
     labelCronometro = new CronometroLabel(this);
     labelCronometro->setFixedSize(220,60);
     labelCronometro->setAlignment(Qt::AlignCenter);
@@ -166,7 +173,6 @@ Game::Game(QWidget *parent): QWidget(parent)
     fonteCronometro.setBold(true);
     labelCronometro->setFont(fonteCronometro);
 
-    labelCronometro->move(width() - labelCronometro->width() - 20,20);
     labelCronometro->show();
     labelCronometro->raise();
 
@@ -175,161 +181,17 @@ Game::Game(QWidget *parent): QWidget(parent)
     connect(cronometroTimer, &QTimer::timeout, this, &Game::atualizarCronometro);
     cronometroTimer->start(cronometroFrameMs);
     atualizarCronometro();
+}
 
-    // gameTimer
+void Game::iniciarGameLoop()
+{
     gameTimer = new QTimer(this);
-
-    connect(gameTimer, &QTimer::timeout, this, &Game::update);
-
+    connect(gameTimer, &QTimer::timeout, this, &Game::atualizarJogo);
     gameTimer->start(frameMs); // aproximadamente 60 FPS
 }
 
-void Game::update()
+void Game::reposicionarInterface()
 {
-    // movement
-    knight->updateMovement();
-
-    for(QGraphicsItem *item : knight->collidingItems())
-    {
-        // portal
-        Portal *portal = dynamic_cast<Portal*>(item);
-
-        if(portal)
-        {
-            ganharVida();
-
-            faseAtual = portal->getDestino();
-
-            carregarFase(faseAtual);
-            break;
-        }
-
-        // princesa
-        Princesa *princesa = dynamic_cast<Princesa*>(item);
-
-        if(princesa)
-        {
-            ganharJogo();
-            break;
-        }
-
-        // armadilha
-        Armadilha *armadilha = dynamic_cast<Armadilha*>(item);
-
-        if(armadilha && armadilha->causaDano())
-        {
-            perderVida();
-            break;
-        }
-    }
-
-    // "buraco"
-    if(knight->y() > limiteQueda)
-    {
-        perderVida();
-    }
-}
-
-void Game::carregarFase(int fase)
-{
-    knight->limparPlataformaMovel();
-    scene->removeItem(knight);
-    scene->clear();
-
-    QFile arquivo(":/Fases/fases.json");
-    if(!arquivo.open(QIODevice::ReadOnly)) // se nao abrir, bota ele em uma posicao padrao
-    {
-        knight->setPos(spawnInicialX,spawnInicialY);
-        scene->addItem(knight);
-        knight->setFocus();
-        return;
-    }
-
-    // le o arquivo todo readAll ee converte pra um objeto Qt
-    QJsonDocument documento = QJsonDocument::fromJson(arquivo.readAll());
-
-    // abre o documento (objeto), pega o valor de fases e converte pra um objeto Qt
-    QJsonObject fases = documento.object().value("fases").toObject();
-
-    // procura a fase desejada com base no valor de int fase e coloca os valores em dados fase como um objeto qt
-    QJsonObject dadosFase = fases.value(QString::number(fase)).toObject();
-
-
-    // checa se ta vazio e retorna pra fase 1
-    if(dadosFase.isEmpty())
-    {
-        faseAtual = 1;
-        dadosFase = fases.value("1").toObject();
-    }
-
-    // pega o valor de plataformas e converte pra um array (toArray)
-    for(const QJsonValue &valorPlataforma : dadosFase.value("plataformas").toArray())
-    {
-        // transforma em um objeto qt e varre ele usando a funcao valor
-        QJsonObject plataforma = valorPlataforma.toObject();
-        scene->addItem(new Plataforma(
-            valor(plataforma, "x"),
-            valor(plataforma, "y"),
-            valor(plataforma, "width"),
-            valor(plataforma, "height")
-            ));
-    }
-
-    for(const QJsonValue &valorPlataforma : dadosFase.value("plataformas_moveis").toArray())
-    {
-        QJsonObject plataforma = valorPlataforma.toObject();
-        scene->addItem(new PlataformaMovel(
-            valor(plataforma, "x"),
-            valor(plataforma, "y"),
-            valor(plataforma, "width"),
-            valor(plataforma, "height"),
-            valor(plataforma, "fimX"),
-            valor(plataforma, "fimY"),
-            valor(plataforma, "velocidade", 2)
-            ));
-    }
-
-    for(const QJsonValue &valorPortal : dadosFase.value("portais").toArray())
-    {
-        QJsonObject portal = valorPortal.toObject();
-        scene->addItem(new Portal(
-            valor(portal, "x"),
-            valor(portal, "y"),
-            portal.value("destino").toInt(1)
-            ));
-    }
-
-    for(const QJsonValue &valorArmadilha : dadosFase.value("armadilhas").toArray())
-    {
-        QJsonObject armadilha = valorArmadilha.toObject();
-        QString tipo = armadilha.value("tipo").toString();
-
-        if(tipo == "espinho")
-            scene->addItem(new Espinho(valor(armadilha, "x"), valor(armadilha, "y")));
-        else if(tipo == "serra")
-            scene->addItem(new Serra(valor(armadilha, "x"), valor(armadilha, "y")));
-    }
-
-    QJsonObject princesa = dadosFase.value("princesa").toObject();
-    if(!princesa.isEmpty())
-    {
-        scene->addItem(new Princesa(
-            valor(princesa, "x"),
-            valor(princesa, "y")
-            ));
-    }
-
-    // le o spawn e converte em objeto
-    QJsonObject spawn = dadosFase.value("spawn").toObject();
-    knight->setPos(valor(spawn, "x", spawnInicialX), valor(spawn, "y", spawnInicialY));
-    scene->addItem(knight);
-    knight->setFocus();
-}
-
-void Game::resizeEvent(QResizeEvent *event)
-{
-    QWidget::resizeEvent(event);
-
     if(view)
     {
         view->fitInView(
@@ -344,7 +206,7 @@ void Game::resizeEvent(QResizeEvent *event)
     {
         int margemX = (width() - view->viewport()->width()) / 2;
         hud->move(margemX + 20,20);
-
+        hud->raise();
     }
 
     if(labelCronometro)
@@ -358,6 +220,79 @@ void Game::resizeEvent(QResizeEvent *event)
         botaoFechar->move((width() - botaoFechar->width()) / 2,20);
         botaoFechar->raise();
     }
+}
+
+void Game::atualizarJogo()
+{
+    knight->updateMovement();
+
+    verificarColisoes();
+    verificarQueda();
+}
+
+void Game::verificarColisoes()
+{
+    for(QGraphicsItem *item : knight->collidingItems())
+    {
+        Portal *portal = dynamic_cast<Portal*>(item);
+        if(portal)
+        {
+            colidirComPortal(portal);
+            return;
+        }
+
+        Princesa *princesa = dynamic_cast<Princesa*>(item);
+        if(princesa)
+        {
+            colidirComPrincesa();
+            return;
+        }
+
+        Armadilha *armadilha = dynamic_cast<Armadilha*>(item);
+        if(armadilha)
+        {
+            colidirComArmadilha(armadilha);
+            return;
+        }
+    }
+}
+
+void Game::colidirComPortal(Portal *portal)
+{
+    ganharVida();
+
+    faseAtual = portal->getDestino();
+    carregarFase(faseAtual);
+}
+
+void Game::colidirComPrincesa()
+{
+    ganharJogo();
+}
+
+void Game::colidirComArmadilha(Armadilha *armadilha)
+{
+    if(armadilha->causaDano())
+        perderVida();
+}
+
+void Game::verificarQueda()
+{
+    if(knight->y() > limiteQueda)
+    {
+        perderVida();
+    }
+}
+
+void Game::carregarFase(int numeroFase)
+{
+    faseAtual = fase->carregar(numeroFase);
+}
+
+void Game::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    reposicionarInterface();
 }
 
 void Game::perderVida()

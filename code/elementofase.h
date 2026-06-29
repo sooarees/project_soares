@@ -7,7 +7,6 @@ class ElementoFase : public QGraphicsRectItem
 {
 public:
     ElementoFase(qreal x, qreal y, qreal width, qreal height);
-
-    //virtual void update();
+    ~ElementoFase() override = default;
 };
 #endif // ELEMENTOFASE_H
