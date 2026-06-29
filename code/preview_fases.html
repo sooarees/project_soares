@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Royal Knight - Editor de Fases</title>
+    <style>
+        :root {
+            --bg: #171717;
+            --panel: #242424;
+            --panel-2: #303030;
+            --line: #4a4a4a;
+            --text: #f2f2f2;
+            --muted: #b9b9b9;
+            --gold: #ffdf00;
+            --blue: #46b7ff;
+            --green: #42d67d;
+            --red: #ff5d5d;
+            --purple: #bf7cff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Segoe UI, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 340px minmax(0, 1fr) 320px;
+            height: 100vh;
+        }
+
+        .panel {
+            background: var(--panel);
+            border-right: 1px solid var(--line);
+            min-height: 0;
+            overflow: auto;
+            padding: 14px;
+        }
+
+        .panel.right {
+            border-left: 1px solid var(--line);
+            border-right: 0;
+        }
+
+        .stage {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        .toolbar {
+            align-items: center;
+            background: #1f1f1f;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            gap: 10px;
+            min-height: 58px;
+            padding: 10px 14px;
+        }
+
+        .canvas-wrap {
+            align-items: center;
+            display: flex;
+            flex: 1;
+            justify-content: center;
+            min-height: 0;
+            overflow: auto;
+            padding: 16px;
+        }
+
+        canvas {
+            background: #101820;
+            border: 1px solid #646464;
+            image-rendering: pixelated;
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        h1 {
+            color: var(--gold);
+            font-size: 18px;
+            margin: 0 0 12px;
+        }
+
+        h2 {
+            font-size: 14px;
+            margin: 18px 0 8px;
+        }
+
+        label {
+            color: var(--muted);
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        select,
+        input,
+        textarea {
+            background: #161616;
+            border: 1px solid #555;
+            color: var(--text);
+            outline: none;
+            padding: 7px 8px;
+            width: 100%;
+        }
+
+        textarea {
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            min-height: 260px;
+            resize: vertical;
+            white-space: pre;
+        }
+
+        button {
+            background: var(--panel-2);
+            border: 1px solid #666;
+            color: var(--text);
+            cursor: pointer;
+            padding: 8px 10px;
+        }
+
+        button:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .row {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: 1fr 1fr;
+            margin-bottom: 8px;
+        }
+
+        .row.three {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .status {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 10px;
+            min-height: 18px;
+        }
+
+        .object-list {
+            display: grid;
+            gap: 6px;
+        }
+
+        .object-item {
+            background: #1a1a1a;
+            border: 1px solid #555;
+            cursor: pointer;
+            display: grid;
+            font-size: 12px;
+            gap: 2px;
+            padding: 7px;
+        }
+
+        .object-item.selected {
+            border-color: var(--gold);
+            box-shadow: inset 3px 0 0 var(--gold);
+        }
+
+        .object-type {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .object-meta {
+            color: var(--muted);
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .checkline {
+            align-items: center;
+            display: flex;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .checkline input {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="panel">
+            <h1>Royal Knight</h1>
+
+            <div class="row">
+                <div>
+                    <label for="faseSelect">Fase</label>
+                    <select id="faseSelect"></select>
+                </div>
+                <div>
+                <label for="snapInput">Snap</label>
+                <input id="snapInput" type="text" inputmode="numeric" value="10">
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="reloadBtn">Recarregar</button>
+                <button id="applyBtn">Aplicar JSON</button>
+                <button id="exportBtn">Exportar</button>
+                <button id="saveBtn">Salvar .json</button>
+            </div>
+
+            <div class="checkline">
+                <input id="gridToggle" type="checkbox" checked>
+                <label for="gridToggle">mostrar grid</label>
+            </div>
+
+            <h2>Adicionar</h2>
+            <div class="actions">
+                <button data-add="plataforma">Plataforma</button>
+                <button data-add="movel">Movel</button>
+                <button data-add="espinho">Espinho</button>
+                <button data-add="serra">Serra</button>
+                <button data-add="portal">Portal</button>
+                <button data-add="princesa">Princesa</button>
+                <button data-add="player">Player teste</button>
+            </div>
+
+            <h2>JSON</h2>
+            <textarea id="jsonText" spellcheck="false"></textarea>
+            <div id="status" class="status"></div>
+        </aside>
+
+        <main class="stage">
+            <div class="toolbar">
+                <strong id="faseTitulo">Fase</strong>
+                <span id="mouseInfo" class="hint">x: 0 y: 0</span>
+                <span class="hint">Arraste objetos. Setas movem o selecionado. Delete remove.</span>
+            </div>
+            <div class="canvas-wrap">
+                <canvas id="canvas" width="1920" height="1080"></canvas>
+            </div>
+        </main>
+
+        <aside class="panel right">
+            <h1>Objeto</h1>
+            <div id="editor" class="hint">Selecione algo no canvas ou na lista.</div>
+
+            <h2>Objetos da fase</h2>
+            <div id="objectList" class="object-list"></div>
+        </aside>
+    </div>
+
+    <script>
+        const DEFAULT_DATA = {
+            "fases": {
+                "1": {
+                    "spawn": { "x": 120, "y": 750 },
+                    "plataformas": [
+                        { "x": 0, "y": 950, "width": 1920, "height": 130 }
+                    ],
+                    "plataformas_moveis": [],
+                    "portais": [
+                        { "x": 1760, "y": 850, "destino": 2 }
+                    ],
+                    "armadilhas": []
+                },
+                "2": {
+                    "spawn": { "x": 1760, "y": 750 },
+                    "plataformas": [
+                        { "x": 1180, "y": 950, "width": 740, "height": 130 },
+                        { "x": 920, "y": 850, "width": 260, "height": 36 },
+                        { "x": 590, "y": 790, "width": 260, "height": 36 },
+                        { "x": 0, "y": 950, "width": 420, "height": 130 }
+                    ],
+                    "plataformas_moveis": [],
+                    "portais": [
+                        { "x": 120, "y": 850, "destino": 3 }
+                    ],
+                    "armadilhas": []
+                },
+                "3": {
+                    "spawn": { "x": 120, "y": 750 },
+                    "plataformas": [
+                        { "x": 0, "y": 950, "width": 420, "height": 130 },
+                        { "x": 520, "y": 820, "width": 240, "height": 36 },
+                        { "x": 900, "y": 680, "width": 240, "height": 36 },
+                        { "x": 1280, "y": 540, "width": 360, "height": 36 }
+                    ],
+                    "plataformas_moveis": [],
+                    "portais": [
+                        { "x": 1460, "y": 440, "destino": 4 }
+                    ],
+                    "armadilhas": []
+                },
+                "4": {
+                    "spawn": { "x": 1460, "y": 340 },
+                    "plataformas": [
+                        { "x": 1430, "y": 540, "width": 200, "height": 60 },
+                        { "x": 960, "y": 720, "width": 220, "height": 36 },
+                        { "x": 90, "y": 930, "width": 360, "height": 130 }
+                    ],
+                    "plataformas_moveis": [
+                        { "x": 1140, "y": 610, "width": 180, "height": 32, "fimX": 760, "fimY": 760, "velocidade": 2 },
+                        { "x": 600, "y": 820, "width": 180, "height": 32, "fimX": 600, "fimY": 620, "velocidade": 2 }
+                    ],
+                    "portais": [
+                        { "x": 180, "y": 830, "destino": 5 }
+                    ],
+                    "armadilhas": []
+                },
+                "5": {
+                    "spawn": { "x": 180, "y": 730 },
+                    "plataformas": [
+                        { "x": 90, "y": 930, "width": 360, "height": 130 },
+                        { "x": 570, "y": 800, "width": 260, "height": 36 },
+                        { "x": 900, "y": 650, "width": 260, "height": 36 },
+                        { "x": 1230, "y": 790, "width": 280, "height": 36 },
+                        { "x": 1600, "y": 610, "width": 260, "height": 36 }
+                    ],
+                    "plataformas_moveis": [],
+                    "portais": [
+                        { "x": 1710, "y": 510, "destino": 6 }
+                    ],
+                    "armadilhas": [
+                        { "tipo": "espinho", "x": 610, "y": 760 },
+                        { "tipo": "espinho", "x": 670, "y": 760 },
+                        { "tipo": "espinho", "x": 730, "y": 760 },
+                        { "tipo": "espinho", "x": 1270, "y": 750 },
+                        { "tipo": "espinho", "x": 1330, "y": 750 }
+                    ]
+                },
+                "6": {
+                    "spawn": { "x": 1710, "y": 410 },
+                    "plataformas": [
+                        { "x": 1300, "y": 760, "width": 220, "height": 36 },
+                        { "x": 970, "y": 900, "width": 260, "height": 36 },
+                        { "x": 550, "y": 760, "width": 260, "height": 36 },
+                        { "x": 160, "y": 900, "width": 300, "height": 36 }
+                    ],
+                    "plataformas_moveis": [
+                        { "x": 1360, "y": 670, "width": 170, "height": 32, "fimX": 1030, "fimY": 830, "velocidade": 2 },
+                        { "x": 860, "y": 820, "width": 170, "height": 32, "fimX": 860, "fimY": 570, "velocidade": 2 }
+                    ],
+                    "portais": [
+                        { "x": 260, "y": 800, "destino": 7 }
+                    ],
+                    "armadilhas": [
+                        { "tipo": "espinho", "x": 590, "y": 720 },
+                        { "tipo": "espinho", "x": 650, "y": 720 },
+                        { "tipo": "serra", "x": 1080, "y": 850 }
+                    ]
+                },
+                "7": {
+                    "spawn": { "x": 260, "y": 700 },
+                    "plataformas": [
+                        { "x": 160, "y": 900, "width": 300, "height": 36 },
+                        { "x": 560, "y": 760, "width": 240, "height": 36 },
+                        { "x": 900, "y": 610, "width": 240, "height": 36 },
+                        { "x": 1220, "y": 760, "width": 260, "height": 36 },
+                        { "x": 1560, "y": 950, "width": 360, "height": 130 }
+                    ],
+                    "plataformas_moveis": [
+                        { "x": 1500, "y": 760, "width": 170, "height": 32, "fimX": 1500, "fimY": 850, "velocidade": 2 }
+                    ],
+                    "portais": [],
+                    "princesa": { "x": 1700, "y": 900 },
+                    "armadilhas": [
+                        { "tipo": "espinho", "x": 600, "y": 720 },
+                        { "tipo": "espinho", "x": 660, "y": 720 },
+                        { "tipo": "espinho", "x": 1260, "y": 720 },
+                        { "tipo": "espinho", "x": 1320, "y": 720 },
+                        { "tipo": "serra", "x": 980, "y": 560 }
+                    ]
+                }
+            }
+        };
+
+        const W = 1920;
+        const H = 1080;
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const faseSelect = document.getElementById("faseSelect");
+        const jsonText = document.getElementById("jsonText");
+        const statusEl = document.getElementById("status");
+        const objectList = document.getElementById("objectList");
+        const editor = document.getElementById("editor");
+        const mouseInfo = document.getElementById("mouseInfo");
+        const faseTitulo = document.getElementById("faseTitulo");
+        const snapInput = document.getElementById("snapInput");
+        const gridToggle = document.getElementById("gridToggle");
+
+        let data = structuredClone(DEFAULT_DATA);
+        let currentPhase = "1";
+        let selected = null;
+        let drag = null;
+        let previewPlayer = { x: 120, y: 750, visible: true };
+
+        function setStatus(text, good = true) {
+            statusEl.textContent = text;
+            statusEl.style.color = good ? "#b9b9b9" : "#ff5d5d";
+        }
+
+        function phase() {
+            return data.fases[currentPhase];
+        }
+
+        function ensurePhaseDefaults(fase) {
+            fase.spawn ||= { x: 120, y: 750 };
+            fase.plataformas ||= [];
+            fase.plataformas_moveis ||= [];
+            fase.portais ||= [];
+            fase.armadilhas ||= [];
+        }
+
+        async function loadInitial() {
+            try {
+                const response = await fetch("fases.json", { cache: "no-store" });
+                if (response.ok) {
+                    data = await response.json();
+                    setStatus("fases.json carregado.");
+                }
+            } catch (_) {
+                setStatus("Usando JSON embutido. Para carregar o arquivo real, use Recarregar em servidor local.");
+            }
+            refreshAll();
+        }
+
+        function refreshAll() {
+            for (const fase of Object.values(data.fases)) {
+                ensurePhaseDefaults(fase);
+            }
+            rebuildPhaseSelect();
+            syncJson();
+            selected = null;
+            render();
+        }
+
+        function rebuildPhaseSelect() {
+            const keys = Object.keys(data.fases).sort((a, b) => Number(a) - Number(b));
+            if (!keys.includes(currentPhase)) {
+                currentPhase = keys[0] || "1";
+            }
+            faseSelect.innerHTML = "";
+            for (const key of keys) {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = `Fase ${key}`;
+                faseSelect.appendChild(opt);
+            }
+            faseSelect.value = currentPhase;
+        }
+
+        function syncJson() {
+            jsonText.value = JSON.stringify(data, null, 4);
+        }
+
+        function applyJson() {
+            try {
+                const parsed = JSON.parse(jsonText.value);
+                if (!parsed.fases) throw new Error("JSON sem chave 'fases'.");
+                data = parsed;
+                setStatus("JSON aplicado.");
+                refreshAll();
+            } catch (err) {
+                setStatus(err.message, false);
+            }
+        }
+
+        function exportJson() {
+            syncJson();
+            jsonText.select();
+            navigator.clipboard?.writeText(jsonText.value).then(
+                () => setStatus("JSON copiado para a area de transferencia."),
+                () => setStatus("JSON atualizado no campo de texto.")
+            );
+        }
+
+        async function saveJsonFile() {
+            syncJson();
+            const content = jsonText.value;
+            if (window.showSaveFilePicker) {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: "fases.json",
+                    types: [{ description: "JSON", accept: { "application/json": [".json"] } }]
+                });
+                const writable = await handle.createWritable();
+                await writable.write(content);
+                await writable.close();
+                setStatus("Arquivo salvo.");
+                return;
+            }
+
+            const blob = new Blob([content], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "fases.json";
+            link.click();
+            URL.revokeObjectURL(url);
+            setStatus("Download gerado.");
+        }
+
+        function getObjects() {
+            const f = phase();
+            const objects = [];
+            objects.push({ type: "spawn", label: "Spawn", obj: f.spawn, rect: () => ({ x: f.spawn.x, y: f.spawn.y, width: 51, height: 96 }) });
+            if (previewPlayer.visible) {
+                objects.push({ type: "player", label: "Player teste", obj: previewPlayer, nonJson: true, rect: () => ({ x: previewPlayer.x, y: previewPlayer.y, width: 51, height: 96 }) });
+            }
+            f.plataformas.forEach((obj, index) => objects.push({ type: "plataforma", label: `Plataforma ${index + 1}`, obj, index, rect: () => obj }));
+            f.plataformas_moveis.forEach((obj, index) => objects.push({ type: "movel", label: `Movel ${index + 1}`, obj, index, rect: () => obj }));
+            f.portais.forEach((obj, index) => objects.push({ type: "portal", label: `Portal ${index + 1}`, obj, index, rect: () => ({ x: obj.x, y: obj.y, width: 77, height: 100 }) }));
+            f.armadilhas.forEach((obj, index) => {
+                const size = obj.tipo === "serra" ? { width: 130, height: 130 } : { width: 60, height: 40 };
+                objects.push({ type: "armadilha", label: `${obj.tipo} ${index + 1}`, obj, index, rect: () => ({ x: obj.x, y: obj.y, ...size }) });
+            });
+            if (f.princesa && Number.isFinite(f.princesa.x)) {
+                objects.push({ type: "princesa", label: "Princesa", obj: f.princesa, rect: () => ({ x: f.princesa.x, y: f.princesa.y, width: 115, height: 50 }) });
+            }
+            return objects;
+        }
+
+        function render(skipEditor = false) {
+            const f = phase();
+            ensurePhaseDefaults(f);
+            faseTitulo.textContent = `Fase ${currentPhase}`;
+            ctx.clearRect(0, 0, W, H);
+            drawBackground();
+            if (gridToggle.checked) drawGrid();
+
+            for (const p of f.plataformas) drawPlatform(p, false);
+            for (const p of f.plataformas_moveis) drawMovingPlatform(p);
+            for (const p of f.portais) drawPortal(p);
+            for (const a of f.armadilhas) drawTrap(a);
+            if (f.princesa && Number.isFinite(f.princesa.x)) drawPrincess(f.princesa);
+            drawSpawn(f.spawn);
+            if (previewPlayer.visible) drawPreviewPlayer(previewPlayer);
+            drawSelected();
+            rebuildObjectList();
+            if (!skipEditor) {
+                rebuildEditor();
+            }
+        }
+
+        function drawBackground() {
+            ctx.fillStyle = "#101820";
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = "#162330";
+            for (let y = 0; y < H; y += 90) {
+                ctx.fillRect(0, y, W, 2);
+            }
+        }
+
+        function drawGrid() {
+            ctx.save();
+            ctx.strokeStyle = "rgba(255,255,255,.08)";
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= W; x += 50) line(x, 0, x, H);
+            for (let y = 0; y <= H; y += 50) line(0, y, W, y);
+            ctx.strokeStyle = "rgba(255,223,0,.18)";
+            for (let x = 0; x <= W; x += 200) line(x, 0, x, H);
+            for (let y = 0; y <= H; y += 200) line(0, y, W, y);
+            ctx.restore();
+        }
+
+        function line(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        function drawPlatform(p, moving) {
+            ctx.fillStyle = moving ? "#5cc8ff" : "#8d724f";
+            ctx.fillRect(p.x, p.y, p.width, p.height);
+            ctx.strokeStyle = moving ? "#d9f5ff" : "#dbc18a";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(p.x, p.y, p.width, p.height);
+            ctx.fillStyle = "rgba(0,0,0,.25)";
+            ctx.fillRect(p.x, p.y + Math.min(14, p.height / 2), p.width, Math.max(2, p.height - 14));
+        }
+
+        function drawMovingPlatform(p) {
+            ctx.save();
+            ctx.strokeStyle = "#46b7ff";
+            ctx.lineWidth = 4;
+            line(p.x + p.width / 2, p.y + p.height / 2, p.fimX + p.width / 2, p.fimY + p.height / 2);
+            ctx.globalAlpha = 0.35;
+            drawPlatform({ x: p.fimX, y: p.fimY, width: p.width, height: p.height }, true);
+            ctx.globalAlpha = 1;
+            drawPlatform(p, true);
+            ctx.restore();
+        }
+
+        function drawPortal(p) {
+            ctx.fillStyle = "rgba(191,124,255,.35)";
+            ctx.fillRect(p.x, p.y, 77, 100);
+            ctx.strokeStyle = "#bf7cff";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(p.x, p.y, 77, 100);
+            label(`→ ${p.destino}`, p.x + 8, p.y + 58, "#fff");
+        }
+
+        function drawTrap(a) {
+            if (a.tipo === "serra") {
+                ctx.fillStyle = "#cfd2d6";
+                ctx.beginPath();
+                ctx.arc(a.x + 65, a.y + 65, 55, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#6d737b";
+                ctx.lineWidth = 5;
+                ctx.stroke();
+                return;
+            }
+
+            ctx.fillStyle = "#ff5d5d";
+            for (let i = 0; i < 2; i++) {
+                ctx.beginPath();
+                ctx.moveTo(a.x + i * 30, a.y + 40);
+                ctx.lineTo(a.x + i * 30 + 15, a.y);
+                ctx.lineTo(a.x + i * 30 + 30, a.y + 40);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        function drawPrincess(p) {
+            ctx.fillStyle = "#ff9dcf";
+            ctx.fillRect(p.x, p.y, 115, 50);
+            ctx.strokeStyle = "#fff";
+            ctx.strokeRect(p.x, p.y, 115, 50);
+            label("princesa", p.x + 8, p.y + 32, "#000");
+        }
+
+        function drawSpawn(p) {
+            ctx.fillStyle = "rgba(66, 214, 125, .55)";
+            ctx.fillRect(p.x, p.y, 51, 96);
+            ctx.strokeStyle = "#d9ffe6";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(p.x, p.y, 51, 96);
+            label("spawn", p.x - 4, p.y - 8, "#d9ffe6");
+        }
+
+        function drawPreviewPlayer(p) {
+            const visual = {
+                x: p.x + (51 - 240) / 2,
+                y: p.y + (96 - 210) + 55,
+                width: 240,
+                height: 210
+            };
+
+            ctx.fillStyle = "rgba(66, 214, 125, .18)";
+            ctx.fillRect(visual.x, visual.y, visual.width, visual.height);
+            ctx.strokeStyle = "#42d67d";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(visual.x, visual.y, visual.width, visual.height);
+
+            ctx.fillStyle = "rgba(255, 223, 0, .35)";
+            ctx.fillRect(p.x, p.y + 5, 51, 91);
+            ctx.strokeStyle = "#ffdf00";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(p.x, p.y + 5, 51, 91);
+
+            label("player", p.x - 4, p.y - 8, "#d9ffe6");
+            label("hitbox", p.x + 60, p.y + 56, "#ffdf00");
+        }
+
+        function label(text, x, y, color) {
+            ctx.fillStyle = color;
+            ctx.font = "22px Segoe UI";
+            ctx.fillText(text, x, y);
+        }
+
+        function drawSelected() {
+            if (!selected) return;
+            const r = selected.rect();
+            ctx.save();
+            ctx.strokeStyle = "#ffdf00";
+            ctx.lineWidth = 5;
+            ctx.setLineDash([12, 8]);
+            ctx.strokeRect(r.x - 5, r.y - 5, r.width + 10, r.height + 10);
+            ctx.restore();
+        }
+
+        function rebuildObjectList() {
+            objectList.innerHTML = "";
+            for (const item of getObjects()) {
+                const div = document.createElement("div");
+                div.className = "object-item" + (selected && selected.obj === item.obj && selected.type === item.type ? " selected" : "");
+                const r = item.rect();
+                div.innerHTML = `<span class="object-type">${item.label}</span><span class="object-meta">x ${Math.round(r.x)} y ${Math.round(r.y)} w ${Math.round(r.width)} h ${Math.round(r.height)}</span>`;
+                div.onclick = () => {
+                    selected = item;
+                    render();
+                };
+                objectList.appendChild(div);
+            }
+        }
+
+        function rebuildEditor() {
+            if (!selected) {
+                editor.innerHTML = "Selecione algo no canvas ou na lista.";
+                return;
+            }
+            const obj = selected.obj;
+            const fields = Object.keys(obj).filter(k => typeof obj[k] === "number" || typeof obj[k] === "string");
+            editor.innerHTML = `<h2>${selected.label}</h2>`;
+            for (const key of fields) {
+                const wrap = document.createElement("div");
+                wrap.style.marginBottom = "8px";
+                wrap.innerHTML = `<label>${key}</label>`;
+                const input = document.createElement("input");
+                input.value = obj[key];
+                input.type = "text";
+                if (typeof obj[key] === "number") {
+                    input.inputMode = "decimal";
+                }
+                input.oninput = () => {
+                    if (typeof obj[key] === "number") {
+                        const value = Number(input.value.replace(",", "."));
+                        if (!Number.isNaN(value)) {
+                            obj[key] = value;
+                        }
+                    } else {
+                        obj[key] = input.value;
+                    }
+                    if (!selected.nonJson) {
+                        syncJson();
+                    }
+                    render(true);
+                };
+                wrap.appendChild(input);
+                editor.appendChild(wrap);
+            }
+            const del = document.createElement("button");
+            del.textContent = "Remover";
+            del.onclick = deleteSelected;
+            editor.appendChild(del);
+        }
+
+        function canvasPoint(event) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (event.clientX - rect.left) * W / rect.width,
+                y: (event.clientY - rect.top) * H / rect.height
+            };
+        }
+
+        function hitTest(point) {
+            const objects = getObjects().reverse();
+            for (const item of objects) {
+                const r = item.rect();
+                if (point.x >= r.x && point.x <= r.x + r.width && point.y >= r.y && point.y <= r.y + r.height) {
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        function snap(value) {
+            const step = Math.max(1, Number(String(snapInput.value).replace(",", ".")) || 1);
+            return Math.round(value / step) * step;
+        }
+
+        function moveSelected(dx, dy) {
+            if (!selected) return;
+            const obj = selected.obj;
+            obj.x = snap((obj.x || 0) + dx);
+            obj.y = snap((obj.y || 0) + dy);
+            if (selected.type === "movel" && drag?.moveEndTogether) {
+                obj.fimX = snap((obj.fimX || 0) + dx);
+                obj.fimY = snap((obj.fimY || 0) + dy);
+            }
+            if (!selected.nonJson) {
+                syncJson();
+            }
+            render();
+        }
+
+        canvas.addEventListener("mousedown", event => {
+            const p = canvasPoint(event);
+            selected = hitTest(p);
+            if (selected) {
+                const r = selected.rect();
+                drag = {
+                    startX: p.x,
+                    startY: p.y,
+                    objX: selected.obj.x,
+                    objY: selected.obj.y,
+                    moveEndTogether: selected.type === "movel",
+                    offsetX: p.x - r.x,
+                    offsetY: p.y - r.y
+                };
+            }
+            render();
+        });
+
+        window.addEventListener("mousemove", event => {
+            const p = canvasPoint(event);
+            mouseInfo.textContent = `x: ${Math.round(p.x)} y: ${Math.round(p.y)}`;
+            if (!drag || !selected) return;
+            const obj = selected.obj;
+            const newX = snap(p.x - drag.offsetX);
+            const newY = snap(p.y - drag.offsetY);
+            const dx = newX - obj.x;
+            const dy = newY - obj.y;
+            obj.x = newX;
+            obj.y = newY;
+            if (selected.type === "movel" && drag.moveEndTogether) {
+                obj.fimX = snap((obj.fimX || 0) + dx);
+                obj.fimY = snap((obj.fimY || 0) + dy);
+            }
+            if (!selected.nonJson) {
+                syncJson();
+            }
+            render();
+        });
+
+        window.addEventListener("mouseup", () => drag = null);
+
+        window.addEventListener("keydown", event => {
+            if (document.activeElement && ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+            const step = event.shiftKey ? 50 : Math.max(1, Number(String(snapInput.value).replace(",", ".")) || 10);
+            if (event.key === "ArrowLeft") moveSelected(-step, 0);
+            if (event.key === "ArrowRight") moveSelected(step, 0);
+            if (event.key === "ArrowUp") moveSelected(0, -step);
+            if (event.key === "ArrowDown") moveSelected(0, step);
+            if (event.key === "Delete") deleteSelected();
+        });
+
+        function deleteSelected() {
+            if (!selected) return;
+            const f = phase();
+            if (selected.type === "plataforma") f.plataformas.splice(selected.index, 1);
+            if (selected.type === "movel") f.plataformas_moveis.splice(selected.index, 1);
+            if (selected.type === "portal") f.portais.splice(selected.index, 1);
+            if (selected.type === "armadilha") f.armadilhas.splice(selected.index, 1);
+            if (selected.type === "princesa") delete f.princesa;
+            if (selected.type === "player") previewPlayer.visible = false;
+            selected = null;
+            syncJson();
+            render();
+        }
+
+        function addObject(type) {
+            const f = phase();
+            ensurePhaseDefaults(f);
+            if (type === "plataforma") f.plataformas.push({ x: 800, y: 850, width: 240, height: 36 });
+            if (type === "movel") f.plataformas_moveis.push({ x: 800, y: 820, width: 170, height: 32, fimX: 1100, fimY: 700, velocidade: 2 });
+            if (type === "espinho") f.armadilhas.push({ tipo: "espinho", x: 820, y: 810 });
+            if (type === "serra") f.armadilhas.push({ tipo: "serra", x: 900, y: 750 });
+            if (type === "portal") f.portais.push({ x: 1700, y: 850, destino: Number(currentPhase) + 1 });
+            if (type === "princesa") f.princesa = { x: 1700, y: 900 };
+            if (type === "player") {
+                previewPlayer = { x: f.spawn.x, y: f.spawn.y, visible: true };
+                selected = { type: "player", label: "Player teste", obj: previewPlayer, nonJson: true, rect: () => ({ x: previewPlayer.x, y: previewPlayer.y, width: 51, height: 96 }) };
+                render();
+                return;
+            }
+            syncJson();
+            render();
+        }
+
+        faseSelect.onchange = () => {
+            currentPhase = faseSelect.value;
+            selected = null;
+            previewPlayer = { x: phase().spawn.x, y: phase().spawn.y, visible: true };
+            render();
+        };
+        document.getElementById("applyBtn").onclick = applyJson;
+        document.getElementById("exportBtn").onclick = exportJson;
+        document.getElementById("saveBtn").onclick = () => saveJsonFile().catch(err => setStatus(err.message, false));
+        document.getElementById("reloadBtn").onclick = loadInitial;
+        gridToggle.onchange = render;
+        document.querySelectorAll("[data-add]").forEach(btn => {
+            btn.onclick = () => addObject(btn.dataset.add);
+        });
+
+        loadInitial();
+    </script>
+</body>
+</html>
