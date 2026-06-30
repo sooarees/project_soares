@@ -236,6 +236,12 @@
                 <button id="saveBtn">Salvar .json</button>
             </div>
 
+            <h2>Fases</h2>
+            <div class="actions">
+                <button id="addPhaseBtn">Nova no fim</button>
+                <button id="insertPhaseBtn">Inserir depois desta</button>
+            </div>
+
             <div class="checkline">
                 <input id="gridToggle" type="checkbox" checked>
                 <label for="gridToggle">mostrar grid</label>
@@ -421,6 +427,7 @@
         let selected = null;
         let drag = null;
         let previewPlayer = { x: 120, y: 750, visible: true };
+        let clipboardObject = null;
 
         function setStatus(text, good = true) {
             statusEl.textContent = text;
@@ -479,6 +486,69 @@
 
         function syncJson() {
             jsonText.value = JSON.stringify(data, null, 4);
+        }
+
+        function emptyPhase() {
+            return {
+                spawn: { x: 120, y: 750 },
+                plataformas: [
+                    { x: 0, y: 950, width: 420, height: 130 }
+                ],
+                plataformas_moveis: [],
+                portais: [],
+                armadilhas: []
+            };
+        }
+
+        function sortedPhaseNumbers() {
+            return Object.keys(data.fases)
+                .map(Number)
+                .filter(Number.isFinite)
+                .sort((a, b) => a - b);
+        }
+
+        function updatePortalDestinationsAfterInsert(insertedNumber) {
+            for (const fase of Object.values(data.fases)) {
+                ensurePhaseDefaults(fase);
+                for (const portal of fase.portais) {
+                    if (Number(portal.destino) >= insertedNumber) {
+                        portal.destino = Number(portal.destino) + 1;
+                    }
+                }
+            }
+        }
+
+        function addPhaseAtEnd() {
+            const numbers = sortedPhaseNumbers();
+            const nextNumber = numbers.length ? Math.max(...numbers) + 1 : 1;
+            data.fases[String(nextNumber)] = emptyPhase();
+            currentPhase = String(nextNumber);
+            selected = null;
+            previewPlayer = { x: 120, y: 750, visible: true };
+            setStatus(`Fase ${nextNumber} criada.`);
+            refreshAll();
+        }
+
+        function insertPhaseAfterCurrent() {
+            const currentNumber = Number(currentPhase);
+            const insertedNumber = currentNumber + 1;
+            const numbers = sortedPhaseNumbers().sort((a, b) => b - a);
+
+            for (const number of numbers) {
+                if (number >= insertedNumber) {
+                    data.fases[String(number + 1)] = data.fases[String(number)];
+                    delete data.fases[String(number)];
+                }
+            }
+
+            updatePortalDestinationsAfterInsert(insertedNumber);
+            data.fases[String(insertedNumber)] = emptyPhase();
+
+            currentPhase = String(insertedNumber);
+            selected = null;
+            previewPlayer = { x: 120, y: 750, visible: true };
+            setStatus(`Fase ${insertedNumber} inserida.`);
+            refreshAll();
         }
 
         function applyJson() {
@@ -847,6 +917,16 @@
 
         window.addEventListener("keydown", event => {
             if (document.activeElement && ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+            if (event.ctrlKey && event.key.toLowerCase() === "c") {
+                event.preventDefault();
+                copySelected();
+                return;
+            }
+            if (event.ctrlKey && event.key.toLowerCase() === "v") {
+                event.preventDefault();
+                pasteCopied();
+                return;
+            }
             const step = event.shiftKey ? 50 : Math.max(1, Number(String(snapInput.value).replace(",", ".")) || 10);
             if (event.key === "ArrowLeft") moveSelected(-step, 0);
             if (event.key === "ArrowRight") moveSelected(step, 0);
@@ -854,6 +934,94 @@
             if (event.key === "ArrowDown") moveSelected(0, step);
             if (event.key === "Delete") deleteSelected();
         });
+
+        function cloneObject(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        function copySelected() {
+            if (!selected) return;
+
+            clipboardObject = {
+                type: selected.type,
+                obj: cloneObject(selected.obj),
+                nonJson: selected.nonJson || false
+            };
+            setStatus(`${selected.label} copiado.`);
+        }
+
+        function selectPasted(type, obj, index = null, nonJson = false) {
+            const labels = {
+                spawn: "Spawn",
+                plataforma: `Plataforma ${Number(index) + 1}`,
+                movel: `Movel ${Number(index) + 1}`,
+                portal: `Portal ${Number(index) + 1}`,
+                armadilha: `${obj.tipo} ${Number(index) + 1}`,
+                princesa: "Princesa",
+                player: "Player teste"
+            };
+            selected = {
+                type,
+                label: labels[type],
+                obj,
+                index,
+                nonJson,
+                rect: () => {
+                    if (type === "spawn" || type === "player") return { x: obj.x, y: obj.y, width: 51, height: 96 };
+                    if (type === "portal") return { x: obj.x, y: obj.y, width: 77, height: 100 };
+                    if (type === "princesa") return { x: obj.x, y: obj.y, width: 115, height: 50 };
+                    if (type === "armadilha") {
+                        const size = obj.tipo === "serra" ? { width: 130, height: 130 } : { width: 60, height: 40 };
+                        return { x: obj.x, y: obj.y, ...size };
+                    }
+                    return obj;
+                }
+            };
+        }
+
+        function pasteCopied() {
+            if (!clipboardObject) return;
+
+            const f = phase();
+            ensurePhaseDefaults(f);
+            const copy = cloneObject(clipboardObject.obj);
+            copy.x = Number(copy.x || 0) + 40;
+            copy.y = Number(copy.y || 0) + 40;
+
+            if (clipboardObject.type === "movel") {
+                copy.fimX = Number(copy.fimX || 0) + 40;
+                copy.fimY = Number(copy.fimY || 0) + 40;
+            }
+
+            if (clipboardObject.type === "spawn") {
+                f.spawn = copy;
+                selectPasted("spawn", f.spawn);
+            } else if (clipboardObject.type === "plataforma") {
+                f.plataformas.push(copy);
+                selectPasted("plataforma", copy, f.plataformas.length - 1);
+            } else if (clipboardObject.type === "movel") {
+                f.plataformas_moveis.push(copy);
+                selectPasted("movel", copy, f.plataformas_moveis.length - 1);
+            } else if (clipboardObject.type === "portal") {
+                f.portais.push(copy);
+                selectPasted("portal", copy, f.portais.length - 1);
+            } else if (clipboardObject.type === "armadilha") {
+                f.armadilhas.push(copy);
+                selectPasted("armadilha", copy, f.armadilhas.length - 1);
+            } else if (clipboardObject.type === "princesa") {
+                f.princesa = copy;
+                selectPasted("princesa", f.princesa);
+            } else if (clipboardObject.type === "player") {
+                previewPlayer = { ...copy, visible: true };
+                selectPasted("player", previewPlayer, null, true);
+                render();
+                return;
+            }
+
+            syncJson();
+            render();
+            setStatus("Objeto colado.");
+        }
 
         function deleteSelected() {
             if (!selected) return;
@@ -898,6 +1066,8 @@
         document.getElementById("exportBtn").onclick = exportJson;
         document.getElementById("saveBtn").onclick = () => saveJsonFile().catch(err => setStatus(err.message, false));
         document.getElementById("reloadBtn").onclick = loadInitial;
+        document.getElementById("addPhaseBtn").onclick = addPhaseAtEnd;
+        document.getElementById("insertPhaseBtn").onclick = insertPhaseAfterCurrent;
         gridToggle.onchange = render;
         document.querySelectorAll("[data-add]").forEach(btn => {
             btn.onclick = () => addObject(btn.dataset.add);
