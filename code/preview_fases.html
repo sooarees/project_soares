@@ -240,6 +240,7 @@
             <div class="actions">
                 <button id="addPhaseBtn">Nova no fim</button>
                 <button id="insertPhaseBtn">Inserir depois desta</button>
+                <button id="deletePhaseBtn">Excluir esta</button>
             </div>
 
             <div class="checkline">
@@ -529,6 +530,51 @@
             refreshAll();
         }
 
+        function updatePortalDestinationsAfterDelete(deletedNumber, maxPhaseNumber) {
+            for (const fase of Object.values(data.fases)) {
+                ensurePhaseDefaults(fase);
+                for (const portal of fase.portais) {
+                    const destino = Number(portal.destino);
+                    if (destino > deletedNumber) {
+                        portal.destino = destino - 1;
+                    } else if (destino === deletedNumber && deletedNumber > maxPhaseNumber) {
+                        portal.destino = maxPhaseNumber;
+                    }
+
+                    if (portal.destino < 1) {
+                        portal.destino = 1;
+                    }
+                }
+            }
+        }
+
+        function deleteCurrentPhase() {
+            const numbers = sortedPhaseNumbers();
+            if (numbers.length <= 1) {
+                setStatus("Nao da para excluir a unica fase.", false);
+                return;
+            }
+
+            const deletedNumber = Number(currentPhase);
+            const ascending = numbers.filter(number => number > deletedNumber);
+
+            delete data.fases[String(deletedNumber)];
+
+            for (const number of ascending) {
+                data.fases[String(number - 1)] = data.fases[String(number)];
+                delete data.fases[String(number)];
+            }
+
+            const maxPhaseNumber = Math.max(...sortedPhaseNumbers());
+            updatePortalDestinationsAfterDelete(deletedNumber, maxPhaseNumber);
+
+            currentPhase = String(Math.min(deletedNumber, maxPhaseNumber));
+            selected = null;
+            previewPlayer = { x: phase().spawn.x, y: phase().spawn.y, visible: true };
+            setStatus(`Fase ${deletedNumber} excluida.`);
+            refreshAll();
+        }
+
         function insertPhaseAfterCurrent() {
             const currentNumber = Number(currentPhase);
             const insertedNumber = currentNumber + 1;
@@ -776,7 +822,47 @@
             ctx.lineWidth = 5;
             ctx.setLineDash([12, 8]);
             ctx.strokeRect(r.x - 5, r.y - 5, r.width + 10, r.height + 10);
+            ctx.setLineDash([]);
+            drawResizeHandles(selected);
             ctx.restore();
+        }
+
+        function canResize(item) {
+            return item && (item.type === "plataforma" || item.type === "movel");
+        }
+
+        function resizeHandles(item) {
+            if (!canResize(item)) return [];
+            const r = item.rect();
+            const half = 9;
+            return [
+                { side: "left", x: r.x - half, y: r.y + r.height / 2 - half, width: half * 2, height: half * 2, cursor: "ew-resize" },
+                { side: "right", x: r.x + r.width - half, y: r.y + r.height / 2 - half, width: half * 2, height: half * 2, cursor: "ew-resize" },
+                { side: "top", x: r.x + r.width / 2 - half, y: r.y - half, width: half * 2, height: half * 2, cursor: "ns-resize" },
+                { side: "bottom", x: r.x + r.width / 2 - half, y: r.y + r.height - half, width: half * 2, height: half * 2, cursor: "ns-resize" }
+            ];
+        }
+
+        function drawResizeHandles(item) {
+            if (!canResize(item)) return;
+            ctx.fillStyle = "#ffdf00";
+            ctx.strokeStyle = "#111";
+            ctx.lineWidth = 2;
+            for (const handle of resizeHandles(item)) {
+                ctx.beginPath();
+                ctx.rect(handle.x, handle.y, handle.width, handle.height);
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
+        function hitResizeHandle(point, item) {
+            for (const handle of resizeHandles(item)) {
+                if (point.x >= handle.x && point.x <= handle.x + handle.width && point.y >= handle.y && point.y <= handle.y + handle.height) {
+                    return handle;
+                }
+            }
+            return null;
         }
 
         function rebuildObjectList() {
@@ -874,16 +960,50 @@
             render();
         }
 
+        function resizeSelected(point) {
+            const obj = selected.obj;
+            const minWidth = 20;
+            const minHeight = 20;
+            const right = drag.objX + drag.objWidth;
+            const bottom = drag.objY + drag.objHeight;
+
+            if (drag.handle === "left") {
+                const newX = Math.min(snap(point.x), right - minWidth);
+                obj.x = newX;
+                obj.width = snap(right - newX);
+            } else if (drag.handle === "right") {
+                obj.width = Math.max(minWidth, snap(point.x - drag.objX));
+            } else if (drag.handle === "top") {
+                const newY = Math.min(snap(point.y), bottom - minHeight);
+                obj.y = newY;
+                obj.height = snap(bottom - newY);
+            } else if (drag.handle === "bottom") {
+                obj.height = Math.max(minHeight, snap(point.y - drag.objY));
+            }
+
+            if (!selected.nonJson) {
+                syncJson();
+            }
+            render();
+        }
+
         canvas.addEventListener("mousedown", event => {
             const p = canvasPoint(event);
-            selected = hitTest(p);
+            const handle = hitResizeHandle(p, selected);
+            if (!handle) {
+                selected = hitTest(p);
+            }
             if (selected) {
                 const r = selected.rect();
                 drag = {
+                    mode: handle ? "resize" : "move",
+                    handle: handle?.side,
                     startX: p.x,
                     startY: p.y,
                     objX: selected.obj.x,
                     objY: selected.obj.y,
+                    objWidth: selected.obj.width,
+                    objHeight: selected.obj.height,
                     moveEndTogether: selected.type === "movel",
                     offsetX: p.x - r.x,
                     offsetY: p.y - r.y
@@ -895,7 +1015,15 @@
         window.addEventListener("mousemove", event => {
             const p = canvasPoint(event);
             mouseInfo.textContent = `x: ${Math.round(p.x)} y: ${Math.round(p.y)}`;
+            const hoverHandle = hitResizeHandle(p, selected);
+            canvas.style.cursor = hoverHandle ? hoverHandle.cursor : "default";
             if (!drag || !selected) return;
+
+            if (drag.mode === "resize") {
+                resizeSelected(p);
+                return;
+            }
+
             const obj = selected.obj;
             const newX = snap(p.x - drag.offsetX);
             const newY = snap(p.y - drag.offsetY);
@@ -1068,6 +1196,7 @@
         document.getElementById("reloadBtn").onclick = loadInitial;
         document.getElementById("addPhaseBtn").onclick = addPhaseAtEnd;
         document.getElementById("insertPhaseBtn").onclick = insertPhaseAfterCurrent;
+        document.getElementById("deletePhaseBtn").onclick = deleteCurrentPhase;
         gridToggle.onchange = render;
         document.querySelectorAll("[data-add]").forEach(btn => {
             btn.onclick = () => addObject(btn.dataset.add);
