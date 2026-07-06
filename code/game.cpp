@@ -72,7 +72,6 @@ Game::Game(QWidget *parent)
     configurarView();
 
     showFullScreen();
-    // showMaximized();
 
     configurarHud();
     configurarBotaoFechar();

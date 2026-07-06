@@ -11,7 +11,6 @@
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QImage>
-#include <QKeyEvent>
 #include <QLabel>
 #include <QLinearGradient>
 #include <QPaintEvent>
@@ -236,21 +235,6 @@ protected:
 Menu::Menu()
 {
     configurarInterface();
-}
-
-void Menu::keyPressEvent(QKeyEvent *event)
-{
-    // TESTE: atalho temporario para resetar o melhor tempo durante o desenvolvimento.
-    if (event->key() == Qt::Key_R)
-    {
-        QSettings configuracoes("Royal Knight", "Royal Knight");
-        configuracoes.remove("melhorTempoMs");
-
-        melhorTempo->setText("Melhor tempo:\n--:--:---");
-        return;
-    }
-
-    QWidget::keyPressEvent(event);
 }
 
 void Menu::paintEvent(QPaintEvent *event)

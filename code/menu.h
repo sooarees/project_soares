@@ -4,7 +4,6 @@
 #include <QWidget>
 
 class QLabel;
-class QKeyEvent;
 class QPaintEvent;
 class QPushButton;
 
@@ -16,7 +15,6 @@ public:
     Menu();
 
 protected:
-    void keyPressEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
 private slots:

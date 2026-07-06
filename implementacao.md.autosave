@@ -1,6 +1,6 @@
 # Implementação
 
-> Esta seção apresenta o processo de construção do jogo, da base gráfica até os recursos finais.
+Processo de construção do jogo, da base gráfica até os recursos finais.
 
 ## Estrutura inicial
 
@@ -37,10 +37,6 @@ Também foi criado o arquivo `preview_fases.html`, usado como ferramenta de apoi
 ## Organização do código
 
 Durante o desenvolvimento, o código foi reorganizado em classes com responsabilidades específicas, aplicando conceitos de programação orientada a objetos, como herança, encapsulamento e polimorfismo.
-
-## Tecnologias
-
-O projeto foi desenvolvido em C++ utilizando Qt Widgets, Qt Creator e CMake.
 
 ---
 

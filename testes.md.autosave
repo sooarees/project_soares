@@ -1,6 +1,6 @@
 # Testes
 
-> Esta seção resume os testes manuais feitos durante o desenvolvimento do jogo.
+Resumo dos testes manuais feitos durante o desenvolvimento do jogo.
 
 ## Processo geral
 

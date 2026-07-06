@@ -19,3 +19,4 @@
 - [**2. PROJETO ORIENTADO A OBJETO**](./projeto.md)
 - [**3. IMPLEMENTAÇÃO (C++)**](./implementacao.md)
 - [**4. TESTES**](./testes.md)
+- [**5. CONCLUSÃO**](./conclusao.md)

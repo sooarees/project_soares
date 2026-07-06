@@ -7,3 +7,8 @@
 5. Clique em **Build** para compilar.
 6. Clique em **Run** para executar o jogo.
 
+## Preview das fases
+
+Para visualizar e ajustar as fases, abra o arquivo `preview_fases.html` no navegador.
+
+Ele serve apenas como ferramenta de apoio para editar o `fases.json`.
