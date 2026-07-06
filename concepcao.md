@@ -3,7 +3,7 @@
 ## 1. Visão Geral
 
 ### Nome do Projeto
-Royal Knight (nome temporário)
+Royal Knight
 
 ### Descrição
 Jogo de plataforma 2D focado em movimentação fluida e precisa, no qual o jogador deve superar obstáculos utilizando habilidades de parkour e alcançar o final da fase no menor tempo possível para salvar a princesa.
@@ -57,7 +57,6 @@ O jogador deve ser capaz de:
 - Mover-se para a esquerda e para a direita
 - Pular
 - Utilizar coyote time
-- Utilizar jump buffering
 - Utilizar Fast Fall
 
 ### 5.2 Obstáculos
