@@ -35,7 +35,6 @@ Para versões futuras, algumas melhorias seriam interessantes:
 - criar uma tela de seleção de fases;
 - melhorar o sistema de animações;
 - organizar melhor o carregamento de recursos;
-- transformar a criação de armadilhas em uma factory;
 - separar parte da lógica de colisão e regras de jogo em classes próprias.
 
 ## Considerações finais

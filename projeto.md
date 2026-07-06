@@ -52,7 +52,6 @@ O diagrama abaixo foi montado no **draw.io** como uma versão visual reduzida, d
 
 </div>
 
-O arquivo editável do diagrama está disponível em [`royal_knight_class_diagram.drawio`](./uml/royal_knight_class_diagram.drawio).
 
 ## Diagrama completo em texto
 
@@ -168,29 +167,6 @@ As relações principais usadas no diagrama são:
 
 No diagrama final, as classes do Qt podem aparecer como dependências externas, mas o foco principal deve ficar nas classes próprias do projeto.
 
-## Diagrama de interação: dano em armadilha
-
-O diagrama abaixo representa o fluxo quando o jogador encosta em uma armadilha.
-
-```mermaid
-sequenceDiagram
-    actor Jogador
-    participant Player
-    participant Game
-    participant Armadilha
-    participant Fase
-    participant HUD
-
-    Jogador->>Player: move o personagem
-    Game->>Player: updateMovement()
-    Game->>Player: collidingItems()
-    Game->>Armadilha: causaDano()
-    Armadilha-->>Game: true
-    Game->>Game: perderVida()
-    Game->>HUD: setVidas(vidas)
-    Game->>Fase: carregar(faseAtual)
-    Fase->>Player: reposiciona no spawn
-```
 
 
 <div align="center">
